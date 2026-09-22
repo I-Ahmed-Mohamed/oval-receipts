@@ -296,7 +296,7 @@ const app = createApp({
                     isDeleted: false
                 };
 
-                await db.collection('delivery_receipts').add(payload);
+                db.collection('delivery_receipts').add(payload).catch(console.error);
                 Swal.fire({ icon: 'success', title: 'تم التسجيل', text: 'تم تسجيل الإذن بنجاح', timer: 1500, showConfirmButton: false });
                 
                 form.value.client = ''; form.value.branch = ''; form.value.notes = ''; form.value.date = '';
