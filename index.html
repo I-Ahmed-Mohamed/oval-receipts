@@ -4,144 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الأذونات - أوفال</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#4f46e5',
-                        primaryHover: '#4338ca',
-                        secondary: '#0f172a',
-                        surface: '#ffffff',
-                        background: '#f8fafc',
-                    },
-                    fontFamily: {
-                        sans: ['Tajawal', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'glow': '0 0 20px rgba(79, 70, 229, 0.15)'
-                    }
+                    colors: { primary: '#4f46e5', secondary: '#0f172a' },
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                    boxShadow: { 'glow': '0 0 20px rgba(79, 70, 229, 0.15)' }
                 }
             }
         }
     </script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
-        body { 
-            font-family: 'Tajawal', sans-serif; 
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            min-height: 100vh;
-        }
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .premium-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-            border: 1px solid rgba(255,255,255,0.6);
-            overflow: hidden;
-        }
-        .input-group {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-        .input-group i {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            transition: color 0.3s;
-        }
-        .premium-input {
-            width: 100%;
-            padding: 14px 16px 14px 48px; /* padding right for icon in RTL */
-            border-radius: 16px;
-            border: 2px solid #e2e8f0;
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-weight: 500;
-            outline: none;
-            transition: all 0.3s ease;
-            appearance: none;
-        }
+        body { font-family: 'Tajawal', sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh; }
+        .premium-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.6); }
+        .input-group { position: relative; margin-bottom: 1.5rem; }
+        .input-group i { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; transition: color 0.3s; z-index: 10; }
+        .premium-input { width: 100%; padding: 14px 16px 14px 48px; border-radius: 16px; border: 2px solid #e2e8f0; background-color: #f8fafc; color: #1e293b; font-weight: 500; outline: none; transition: all 0.3s ease; appearance: none; cursor: pointer; }
         .input-group:focus-within i { color: #4f46e5; }
-        .premium-input:focus {
-            border-color: #4f46e5;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
-        .premium-button {
-            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
-            color: white;
-            font-weight: 800;
-            font-size: 1.1rem;
-            padding: 16px;
-            border-radius: 16px;
-            width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
-        }
-        .premium-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.5);
-        }
-        .premium-button:active {
-            transform: translateY(0);
-        }
+        .premium-input:focus { border-color: #4f46e5; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
         
-        .tab-btn {
-            position: relative;
-            z-index: 1;
-        }
-        .tab-active-bg {
-            position: absolute;
-            inset: 0;
-            background: #0f172a;
-            border-radius: 14px;
-            z-index: -1;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .list-item-card {
-            transition: all 0.3s ease;
-            border: 1px solid #f1f5f9;
-        }
-        .list-item-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1);
-            border-color: #e2e8f0;
-        }
-        /* Custom scrollbar for dropdowns */
-        select { cursor: pointer; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.show .modal-content { transform: translateY(0) scale(1); }
         
-        .badge {
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .premium-button { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; font-weight: 800; font-size: 1.1rem; padding: 16px; border-radius: 16px; width: 100%; transition: all 0.3s ease; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
+        .premium-button:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.5); }
+        .premium-button:active { transform: translateY(0); }
+        
+        .fab { position: fixed; bottom: 2rem; left: 2rem; width: 4rem; height: 4rem; border-radius: 2rem; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.5); cursor: pointer; transition: all 0.3s; z-index: 40; }
+        .fab:hover { transform: scale(1.05) translateY(-5px); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="pb-24 pt-6 px-4">
 
-<div id="app" class="app-container">
+<div id="app" class="max-w-4xl mx-auto">
     
     <!-- Top Header -->
     <header class="flex items-center justify-between mb-8 premium-card p-5 px-8">
@@ -151,209 +65,164 @@
             </div>
             <div>
                 <h1 class="text-3xl font-black text-slate-800 tracking-tight">أذونات أوفال</h1>
-                <p class="text-slate-500 font-medium mt-1">إدارة وتسجيل حركة التسليمات</p>
+                <p class="text-slate-500 font-medium mt-1 text-sm"><i class="fa-solid fa-cloud text-green-500"></i> متصل بالسيرفر الجديد</p>
             </div>
         </div>
-        <div class="hidden md:block">
-            <span class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl font-bold border border-indigo-100 shadow-sm">
-                <i class="fa-solid fa-signal mr-2 ml-1"></i> يعمل مستقلاً (Offline)
-            </span>
-        </div>
+        <button @click="showModal = true" class="hidden md:flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-5 py-3 rounded-xl font-bold transition-colors">
+            <i class="fa-solid fa-plus"></i> إذن جديد
+        </button>
     </header>
 
-    <div class="flex flex-col lg:flex-row gap-8">
-        
-        <!-- Right Column: Form -->
-        <div class="w-full lg:w-5/12">
-            <div class="premium-card p-8 sticky top-8">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary">
-                        <i class="fa-solid fa-plus"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800">إضافة إذن جديد</h2>
-                </div>
-
-                <form @submit.prevent="submitReceipt">
-                    
-                    <div class="input-group">
-                        <i class="fa-solid fa-user-tie"></i>
-                        <select v-model="form.delegate" @change="saveLocal('delegate', form.delegate)" required class="premium-input" style="padding-right: 48px; padding-left: 16px;">
-                            <option value="" disabled>-- اختر المندوب --</option>
-                            <option v-for="d in delegates" :key="d" :value="d">{{ d }}</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fa-solid fa-truck-moving"></i>
-                        <select v-model="form.driver" @change="saveLocal('driver', form.driver)" required class="premium-input" style="padding-right: 48px; padding-left: 16px;">
-                            <option value="" disabled>-- اختر السائق --</option>
-                            <option v-for="d in drivers" :key="d" :value="d">{{ d }}</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fa-solid fa-building"></i>
-                        <select v-model="form.client" @change="onClientChange" required class="premium-input" style="padding-right: 48px; padding-left: 16px;">
-                            <option value="" disabled>-- اختر العميل --</option>
-                            <option v-for="c in clients" :key="c.name" :value="c.name">{{ c.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <select v-model="form.branch" required class="premium-input" :disabled="!form.client" :class="{'opacity-60': !form.client}" style="padding-right: 48px; padding-left: 16px;">
-                            <option value="" disabled>-- اختر الفرع --</option>
-                            <option v-for="b in currentBranches" :key="b" :value="b">{{ b }}</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fa-solid fa-calendar-day"></i>
-                        <input type="date" v-model="form.date" class="premium-input" style="padding-right: 48px; padding-left: 16px;" title="التاريخ (اختياري)">
-                    </div>
-
-                    <div class="input-group">
-                        <i class="fa-solid fa-pen-clip"></i>
-                        <input type="text" v-model="form.notes" placeholder="ملاحظات (رقم بوليصة، الخ...)" class="premium-input" style="padding-right: 48px; padding-left: 16px;">
-                    </div>
-
-                    <button type="submit" :disabled="isSubmitting" class="premium-button mt-4 flex items-center justify-center gap-3">
-                        <i v-if="!isSubmitting" class="fa-solid fa-paper-plane text-xl"></i>
-                        <i v-else class="fa-solid fa-circle-notch fa-spin text-xl"></i>
-                        <span>{{ isSubmitting ? 'جاري التسجيل...' : 'تسجيل الإذن الآن' }}</span>
-                    </button>
-                </form>
-            </div>
+    <!-- Main List View -->
+    <div class="flex flex-col">
+        <!-- Tabs -->
+        <div class="premium-card p-2 mb-6 flex relative">
+            <button @click="tab = 'pending'" :class="tab === 'pending' ? 'text-white' : 'text-slate-500 hover:text-slate-800'" class="flex-1 py-3.5 font-bold text-lg rounded-2xl transition-colors relative z-10 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-clock"></i> قيد الانتظار
+                <span :class="tab === 'pending' ? 'bg-white/20' : 'bg-slate-100'" class="px-2.5 py-0.5 rounded-full text-sm ml-1">{{ pendingCount }}</span>
+            </button>
+            <button @click="tab = 'archived'" :class="tab === 'archived' ? 'text-white' : 'text-slate-500 hover:text-slate-800'" class="flex-1 py-3.5 font-bold text-lg rounded-2xl transition-colors relative z-10 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-double"></i> الأرشيف
+                <span :class="tab === 'archived' ? 'bg-white/20' : 'bg-slate-100'" class="px-2.5 py-0.5 rounded-full text-sm ml-1">{{ archivedCount }}</span>
+            </button>
+            <div class="absolute top-2 bottom-2 w-[calc(50%-8px)] bg-secondary rounded-xl transition-all duration-300 ease-out z-0"
+                 :style="tab === 'pending' ? 'right: 8px;' : 'right: calc(50% + 4px);'"></div>
         </div>
 
-        <!-- Left Column: History -->
-        <div class="w-full lg:w-7/12 flex flex-col">
+        <!-- Search -->
+        <div class="premium-card p-3 mb-6 relative">
+            <i class="fa-solid fa-magnifying-glass absolute right-7 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+            <input type="text" v-model="searchQuery" placeholder="ابحث باسم العميل، الفرع، المندوب..." class="w-full bg-slate-50 border-none rounded-xl py-4 pr-14 pl-4 font-medium text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-shadow">
+        </div>
+
+        <!-- List -->
+        <div class="space-y-4">
+            <div v-if="filteredReceipts.length === 0" class="premium-card p-16 flex flex-col items-center justify-center text-center">
+                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-700 mb-2">لا توجد أذونات</h3>
+                <p class="text-slate-500">القائمة فارغة أو لا يوجد نتائج تطابق بحثك حالياً.</p>
+            </div>
+
+            <div v-for="item in filteredReceipts" :key="item.id" class="premium-card p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                <div v-if="item.status === 'archived'" class="absolute -left-10 -top-10 bg-emerald-500 w-24 h-24 transform -rotate-45 flex items-end justify-center pb-2 shadow-lg z-10">
+                    <i class="fa-solid fa-check text-white text-xl transform rotate-45"></i>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary shrink-0">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-xl text-slate-800">{{ item.client }}</h3>
+                                <p class="text-slate-500 font-medium text-sm flex items-center gap-1">
+                                    <i class="fa-solid fa-location-arrow text-slate-400 text-xs"></i> {{ item.branch }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold border border-blue-100"><i class="fa-solid fa-user-tie"></i> {{ item.delegate }}</span>
+                            <span class="px-3 py-1 bg-orange-50 text-orange-700 rounded-lg text-sm font-bold border border-orange-100"><i class="fa-solid fa-steering-wheel"></i> {{ item.driver }}</span>
+                            <span v-if="item.notes" class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold border border-slate-200"><i class="fa-solid fa-note-sticky text-slate-400"></i> {{ item.notes }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-end justify-between min-w-[120px]">
+                        <div class="text-left bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-full mb-4">
+                            <div class="text-xs text-slate-400 font-bold mb-1"><i class="fa-regular fa-calendar"></i> {{ item.dateStr }}</div>
+                            <div class="text-sm font-black text-slate-700"><i class="fa-regular fa-clock text-primary"></i> {{ item.timeStr }}</div>
+                        </div>
+                        <div class="w-full flex gap-2">
+                            <button v-if="tab === 'pending'" @click="markAsArchived(item.id)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-sm">
+                                <i class="fa-solid fa-check"></i> استلمت
+                            </button>
+                            <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 px-4 rounded-xl transition-all border border-rose-200 text-sm">
+                                <i class="fa-solid fa-trash-can"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile FAB -->
+    <div class="md:hidden fab" @click="showModal = true">
+        <i class="fa-solid fa-plus"></i>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal-overlay" :class="{'show': showModal}" @mousedown.self="showModal = false">
+        <div class="modal-content">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
+                <h2 class="text-xl font-black text-slate-800 flex items-center gap-2"><i class="fa-solid fa-file-pen text-primary"></i> إضافة إذن جديد</h2>
+                <button @click="showModal = false" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
             
-            <!-- Modern Tabs -->
-            <div class="premium-card p-2 mb-6 flex relative">
-                <button @click="tab = 'pending'" :class="tab === 'pending' ? 'text-white' : 'text-slate-500 hover:text-slate-800'" class="flex-1 py-3.5 font-bold text-lg rounded-2xl transition-colors relative z-10 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-clock"></i> قيد الانتظار
-                    <span :class="tab === 'pending' ? 'bg-white/20' : 'bg-slate-100'" class="px-2.5 py-0.5 rounded-full text-sm ml-1 transition-colors">{{ pendingCount }}</span>
-                </button>
-                <button @click="tab = 'archived'" :class="tab === 'archived' ? 'text-white' : 'text-slate-500 hover:text-slate-800'" class="flex-1 py-3.5 font-bold text-lg rounded-2xl transition-colors relative z-10 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check-double"></i> الأرشيف
-                    <span :class="tab === 'archived' ? 'bg-white/20' : 'bg-slate-100'" class="px-2.5 py-0.5 rounded-full text-sm ml-1 transition-colors">{{ archivedCount }}</span>
-                </button>
+            <form @submit.prevent="submitReceipt" class="p-6 space-y-2">
+                <!-- Custom Selects -->
+                <custom-select v-model="form.delegate" :options="delegates" icon="fa-solid fa-user-tie" placeholder="-- اختر المندوب --" @change="saveLocal('delegate', form.delegate)"></custom-select>
+                <custom-select v-model="form.driver" :options="drivers" icon="fa-solid fa-truck-moving" placeholder="-- اختر السائق --" @change="saveLocal('driver', form.driver)"></custom-select>
+                <custom-select v-model="form.client" :options="clientNames" icon="fa-solid fa-building" placeholder="-- اختر العميل --" @change="onClientChange"></custom-select>
                 
-                <!-- Animated Active Background -->
-                <div class="absolute top-2 bottom-2 w-[calc(50%-8px)] bg-secondary rounded-xl transition-all duration-300 ease-out z-0"
-                     :style="tab === 'pending' ? 'right: 8px;' : 'right: calc(50% + 4px);'"></div>
-            </div>
+                <custom-select v-model="form.branch" :options="currentBranches" icon="fa-solid fa-location-dot" placeholder="-- اختر الفرع --" :disabled="!form.client"></custom-select>
 
-            <!-- Search Bar -->
-            <div class="premium-card p-3 mb-6 relative">
-                <i class="fa-solid fa-magnifying-glass absolute right-7 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
-                <input type="text" v-model="searchQuery" placeholder="ابحث باسم العميل، الفرع، المندوب..." class="w-full bg-slate-50 border-none rounded-xl py-4 pr-14 pl-4 font-medium text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-shadow">
-            </div>
-
-            <!-- List -->
-            <div class="flex-1">
-                <div v-if="filteredReceipts.length === 0" class="premium-card p-16 flex flex-col items-center justify-center text-center">
-                    <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-                        <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-700 mb-2">لا توجد أذونات</h3>
-                    <p class="text-slate-500">القائمة فارغة أو لا يوجد نتائج تطابق بحثك حالياً.</p>
+                <div class="input-group mt-4">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <input type="date" v-model="form.date" class="premium-input" style="padding-right: 48px; padding-left: 16px;">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-pen-clip"></i>
+                    <input type="text" v-model="form.notes" placeholder="ملاحظات (رقم بوليصة، الخ...)" class="premium-input" style="padding-right: 48px; padding-left: 16px;">
                 </div>
 
-                <div class="space-y-4">
-                    <div v-for="item in filteredReceipts" :key="item.id" class="premium-card list-item-card p-6 relative overflow-hidden group">
-                        
-                        <!-- Archive Ribbon -->
-                        <div v-if="item.status === 'archived'" class="absolute -left-10 -top-10 bg-emerald-500 w-24 h-24 transform -rotate-45 flex items-end justify-center pb-2 shadow-lg z-10">
-                            <i class="fa-solid fa-check text-white text-xl transform rotate-45"></i>
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                            <!-- Info -->
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary shrink-0">
-                                        <i class="fa-solid fa-building"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-black text-xl text-slate-800">{{ item.client }}</h3>
-                                        <p class="text-slate-500 font-medium text-sm flex items-center gap-1">
-                                            <i class="fa-solid fa-location-arrow text-slate-400 text-xs"></i> {{ item.branch }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-wrap gap-2 mt-4">
-                                    <div class="badge bg-blue-50 text-blue-700 border border-blue-100">
-                                        <i class="fa-solid fa-user-tie"></i> {{ item.delegate }}
-                                    </div>
-                                    <div class="badge bg-orange-50 text-orange-700 border border-orange-100">
-                                        <i class="fa-solid fa-steering-wheel"></i> {{ item.driver }}
-                                    </div>
-                                    <div v-if="item.notes" class="badge bg-slate-100 text-slate-700 border border-slate-200">
-                                        <i class="fa-solid fa-note-sticky text-slate-400"></i> {{ item.notes }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right Side (Time & Actions) -->
-                            <div class="flex flex-col items-end justify-between min-w-[120px]">
-                                <div class="text-left bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-full mb-4">
-                                    <div class="text-xs text-slate-400 font-bold mb-1"><i class="fa-regular fa-calendar"></i> {{ item.dateStr }}</div>
-                                    <div class="text-sm font-black text-slate-700"><i class="fa-regular fa-clock text-primary"></i> {{ item.timeStr }}</div>
-                                </div>
-
-                                <div class="w-full flex gap-2">
-                                    <button v-if="tab === 'pending'" @click="markAsArchived(item.id)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md shadow-emerald-500/20 text-sm flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-check"></i> استلمت
-                                    </button>
-                                    <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 px-4 rounded-xl transition-all border border-rose-200 text-sm flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-trash-can"></i> حذف
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                <button type="submit" :disabled="isSubmitting" class="premium-button mt-4">
+                    <i v-if="!isSubmitting" class="fa-solid fa-paper-plane text-xl ml-2"></i>
+                    <i v-else class="fa-solid fa-circle-notch fa-spin text-xl ml-2"></i>
+                    <span>{{ isSubmitting ? 'جاري التسجيل...' : 'تسجيل الإذن الآن' }}</span>
+                </button>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
-// Master Data Hardcoded
 const MASTER_DATA = {"clients":[{"name":"الفار","branches":["الفار زايد","الفار الميرغني","الفار ستريب زون","الفار مدينتي","الفار المهندسين","الفار اربيلا","الفار ميفيدا","الفار شيراتون","الفار التسعين الشمالي","الفار التسعين الجنوبي","الفار B 15","الفار B 6","الفار الساحل","اربيلا"]},{"name":"كارفور","branches":["كارفور المعادي","كارفور المقطم","كارفور الماظة","كارفور سيتي لايت","كارفور سيتي سنتر","كارفور داندي مول","كارفور العاشر","كارفور السلام","كارفور الشروق","كارفور العبور","كارفور 15 مايو","كارفور سراية القبة","كارفور مدينتي","كارفور كايرو فيستيفال","كارفور اعمار","كارفور الأهرام","كارفور داون تاون","كارفور  العروبة","كارفور العجمي","كارفور نيو المعادي","كارفور"]},{"name":"أمازون","branches":["امازون الشيخ زايد","امازون أرض الجولف","امازون هليوبوليس","امازون جولدن بلازا","امازون المعادي","امازون فيوتشر مول","امازون 6 اكتوبر","امازون الهرم","امازون الشروق","امازون العبور","امازون الرحاب","امازون العاشر","امازون مدينة نصر ستريت مول","امازون مكرم عبيد","امازون الدقي","امازون احمد عكاشة","امازون شبرا الخيمة","امازون اسكندرية","امازون فيصل","أمازون الشروق","أمازون 6 اكتوبر","3YY5D9WI","PO: 571BSVQS - Inv: QCA2 - مدينة نصر"]},{"name":"سبينس","branches":["سبينس بيرلي رويز","سبينس مدينة نصر","سبينس ارينا مول","سبينس ايناواكس","سبينس النزهة","سبينس المنصورة","سبينس شارع سوريا","سبينس المهندسين","سبينس سيتي سكيب","سبينس استرادا مول","سبينس مكسيم مول","سبينس مول العرب","سبينس الهرم","سبينس مزارا مول","سبينس الشروق","سبينس العبور","سبينس المعادي","سبينس طنطا","سبينس جري بروجيكت","سبينس الساحل"]},{"name":"أوسكار","branches":["أوسكار المعادي","أوسكار مدينتي","أوسكار الشيخ زايد","أوسكار التجمع","أوسكار ايتابا","أوسكار  الماظة"]},{"name":"بندة","branches":["بندة الرحاب","بندة أكتوبر","بندة المعادي","بندة مدينة نصر","بندة العبور"]},{"name":"أولاد رجب","branches":["أولاد رجب حدائق حلوان","أولاد رجب الجولف","أولاد رجب التجنيد","أولاد رجب العالمين","أولاد رجب الظاهر العباسية","أولاد رجب المعادي","أولاد رجب احمد فخري"]},{"name":"اللولو","branches":["تاون بلازا","بارك مول","لولو وادي دجلة","لولو التجمع الخامس"]},{"name":"سوبيكو","branches":["سوبيكو حلوان","سوبيكو شينزو آبي","سوبيكو المطار","سوبيكو الياسمين","سوبيكو النزهة","سوبيكو سوق المدينة","سوبيكو زكي رجب","سوبيكو السويف","سوبيكو وينجيت","سوبيكو الملتلقي","سوبيكو سنترو مول","سوبيكو شبرا الخيمة","سوبيكو العباسية","سوبيكو اهلينا مول","سوبيكو السلام","سوبيكو بدر","سوبيكو المنصورة","سوبيكو طرة","سوبيكو الوايلي","سوبيكو شوتس","سوبيكو الفيوم","سوبيكو القناطر","سوبيكو العمرانية","سوبيكو قويسنا","سوبيكو سنجر شبرا","سوبيكو الازهر"]},{"name":"زهران","branches":["زهران المعادي","زهران مدينتي","زهران زايد","زهران التجمع الاول","زهران التجمع الخامس","زهران سموحة","زهران العجمي"]},{"name":"جيان","branches":["جيان التجمع","جيان الرحاب","التجمع","الرحاب"]},{"name":"سوبر سنتر","branches":["اكتوبر"]},{"name":"بانكيكس","branches":["اكتوبر"]},{"name":"نيو ربيا","branches":["مصر الجديدة"]},{"name":"جودز مارت","branches":["اكتوبر"]},{"name":"وكالة المنصورة","branches":["الجامعة","النوادي","دكرنس","الهايبر","المخت��ط","المشاية","البحر الاعظم","قناة السويس","شربين","بلقاس","الترعة","صن مول","برايم مارت المنصورة","السنبلاوين","اجا","صلاح سالم"]},{"name":"نون","branches":["الساحل"]},{"name":"لوما","branches":["اكتوبر"]},{"name":"برينجو","branches":["القاهرة"]},{"name":"فندق سانت ريجيس","branches":["النيل","العاصمة"]},{"name":"جمعية الحصري","branches":["الحصري"]},{"name":"فندق ماريوت مينا هاوس","branches":["الهرم"]},{"name":"بيج فات","branches":["مصنع الحلويات"]},{"name":"راديسون بلو","branches":[]},{"name":"ابراهيم مطبعة","branches":[]},{"name":"عرفة ماركت","branches":[]},{"name":"كازيون","branches":[]},{"name":"اسلام وحيد","branches":[]},{"name":"احمد جلال","branches":[]},{"name":"عميل نقدي","branches":[]},{"name":"محمود عفيفي","branches":[]},{"name":"سبينيس فاليو","branches":[]},{"name":"هدايات","branches":[]},{"name":"محمد عتريس","branches":[]},{"name":"فلامنجو","branches":[]},{"name":"اكسبشن","branches":[]}],"delegates":["احمد وجية","عاصم المندوب","مصطفى فتحي","محمد حسام","محمود اوفال","محمود الجمل","عبد الله الطاهر","مصطفي زكي","محمود هنداوي","احمد محمد"],"drivers":["عاصم السواق","عبدالله شبرا","عبدة ضهر شرب","ربيع متولي","جلال الزلباني","عاطف ظهر شرب","عبد القادر اوفال","محمود الطبلاوي"]};
 
-// Firebase Init
-// ⚠️ هذه إعدادات الفايربيز للمشروع الجديد (فارغة حالياً حتى تقوم بإنشاء مشروع جديد)
-/*
+// NEW Firebase Config
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT"
+  apiKey: "AIzaSyByOrueUjNhgsC22hcZQ5dRac8bpca5s2g",
+  authDomain: "oval-receipts.firebaseapp.com",
+  projectId: "oval-receipts",
+  storageBucket: "oval-receipts.firebasestorage.app",
+  messagingSenderId: "651415652827",
+  appId: "1:651415652827:web:25215c38e5e11f21883ffe",
+  measurementId: "G-T4R28RMJEC"
 };
 firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-*/
-// حالياً هنستخدم LocalStorage كقاعدة بيانات بديلة لحد ما تربط الفايربيز الجديد
+const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const { createApp, ref, computed, onMounted } = Vue;
-
-createApp({
+const app = createApp({
     setup() {
-        const clients = ref(MASTER_DATA.clients);
-        const delegates = ref(MASTER_DATA.delegates);
-        const drivers = ref(MASTER_DATA.drivers);
+        const clients = ref(MASTER_DATA.clients || []);
+        const delegates = ref(MASTER_DATA.delegates || []);
+        const drivers = ref(MASTER_DATA.drivers || []);
         
+        const clientNames = computed(() => clients.value.map(c => c.name || c.client));
+
         const form = ref({
-            client: '',
-            branch: '',
+            client: '', branch: '',
             delegate: localStorage.getItem('savedDelegate') || '',
             driver: localStorage.getItem('savedDriver') || '',
-            date: '',
-            notes: ''
+            date: '', notes: ''
         });
 
         const isSubmitting = ref(false);
@@ -362,49 +231,50 @@ createApp({
         
         const tab = ref('pending');
         const searchQuery = ref('');
+        const showModal = ref(false);
 
         const currentBranches = computed(() => {
-            const c = clients.value.find(x => x.name === form.value.client);
+            const c = clients.value.find(x => (x.name || x.client) === form.value.client);
             return c ? c.branches : [];
         });
 
-        const activeReceipts = computed(() => {
-            return receipts.value.filter(r => !r.isDeleted && !hiddenIds.value.includes(r.id));
-        });
-
+        const activeReceipts = computed(() => receipts.value.filter(r => !r.isDeleted && !hiddenIds.value.includes(r.id)));
         const pendingCount = computed(() => activeReceipts.value.filter(r => r.status === 'pending_review').length);
         const archivedCount = computed(() => activeReceipts.value.filter(r => r.status === 'archived').length);
 
         const filteredReceipts = computed(() => {
-            let list = activeReceipts.value;
-            list = list.filter(r => r.status === (tab.value === 'pending' ? 'pending_review' : 'archived'));
-            
+            let list = activeReceipts.value.filter(r => r.status === (tab.value === 'pending' ? 'pending_review' : 'archived'));
             if (searchQuery.value) {
                 const q = searchQuery.value.toLowerCase();
                 list = list.filter(r => 
-                    (r.client || '').toLowerCase().includes(q) ||
-                    (r.branch || '').toLowerCase().includes(q) ||
-                    (r.delegate || '').toLowerCase().includes(q) ||
-                    (r.driver || '').toLowerCase().includes(q)
+                    (r.client||'').toLowerCase().includes(q) || (r.branch||'').toLowerCase().includes(q) ||
+                    (r.delegate||'').toLowerCase().includes(q) || (r.driver||'').toLowerCase().includes(q)
                 );
             }
             return list;
         });
 
-        const saveLocal = (key, val) => {
-            localStorage.setItem(key === 'delegate' ? 'savedDelegate' : 'savedDriver', val);
-        };
+        const saveLocal = (key, val) => { localStorage.setItem(key === 'delegate' ? 'savedDelegate' : 'savedDriver', val); };
 
         const onClientChange = () => {
-            form.value.branch = '';
+            const branches = currentBranches.value;
+            // Auto-select if there is only one branch
+            if (branches.length === 1) {
+                form.value.branch = branches[0];
+            } else {
+                form.value.branch = '';
+            }
         };
 
         const submitReceipt = async () => {
+            if(!form.value.delegate || !form.value.driver || !form.value.client || !form.value.branch) {
+                Swal.fire({ icon: 'warning', title: 'تنبيه', text: 'يرجى إكمال جميع الحقول المطلوبة' });
+                return;
+            }
             isSubmitting.value = true;
             try {
-                let finalDateStr = '';
                 const now = new Date();
-                
+                let finalDateStr = '';
                 if (form.value.date) {
                     const p = form.value.date.split('-');
                     finalDateStr = `${p[2]}/${p[1]}/${p[0]}`;
@@ -425,25 +295,14 @@ createApp({
                     isDeleted: false
                 };
 
-                // Save to LocalStorage instead of Firebase
-                payload.id = 'rec_' + Date.now();
-                const currentReceipts = JSON.parse(localStorage.getItem('localReceiptsDB') || '[]');
-                currentReceipts.unshift(payload);
-                localStorage.setItem('localReceiptsDB', JSON.stringify(currentReceipts));
-                
-                // Update the reactive array directly
-                receipts.value = currentReceipts;
-                
+                await db.collection('delivery_receipts').add(payload);
                 Swal.fire({ icon: 'success', title: 'تم التسجيل', text: 'تم تسجيل الإذن بنجاح', timer: 1500, showConfirmButton: false });
                 
-                form.value.client = '';
-                form.value.branch = '';
-                form.value.notes = '';
-                form.value.date = '';
+                form.value.client = ''; form.value.branch = ''; form.value.notes = ''; form.value.date = '';
+                showModal.value = false;
                 tab.value = 'pending';
             } catch (err) {
-                Swal.fire({ icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء الإرسال. تأكد من الإنترنت.' });
-                console.error(err);
+                Swal.fire({ icon: 'error', title: 'خطأ', text: 'تأكد من اتصالك بالإنترنت.' });
             } finally {
                 isSubmitting.value = false;
             }
@@ -451,61 +310,117 @@ createApp({
 
         const markAsArchived = async (id) => {
             try {
-                const currentReceipts = JSON.parse(localStorage.getItem('localReceiptsDB') || '[]');
-                const idx = currentReceipts.findIndex(r => r.id === id);
-                if(idx > -1) {
-                    currentReceipts[idx].status = 'archived';
-                    currentReceipts[idx].archivedAt = new Date().toISOString();
-                    localStorage.setItem('localReceiptsDB', JSON.stringify(currentReceipts));
-                    receipts.value = currentReceipts;
-                }
+                await db.collection('delivery_receipts').doc(id).update({ status: 'archived', archivedAt: new Date().toISOString() });
                 Swal.fire({ icon: 'success', title: 'تم الأرشفة', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-            } catch(e) {
-                console.error(e);
-                Swal.fire({ icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء الأرشفة.' });
-            }
+            } catch(e) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء الأرشفة.' }); }
         };
 
         const softDelete = async (id) => {
-            const res = await Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: "سيتم حذف هذا الإذن نهائياً من الأرشيف!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonText: 'إلغاء',
-                confirmButtonText: 'نعم، احذف!'
-            });
-            
+            const res = await Swal.fire({ title: 'تأكيد الحذف؟', text: "سيتم حذف هذا الإذن نهائياً!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonText: 'إلغاء', confirmButtonText: 'نعم، احذف' });
             if (res.isConfirmed) {
                 hiddenIds.value.push(id);
                 localStorage.setItem('hiddenReceipts', JSON.stringify(hiddenIds.value));
-                
-                const currentReceipts = JSON.parse(localStorage.getItem('localReceiptsDB') || '[]');
-                const idx = currentReceipts.findIndex(r => r.id === id);
-                if(idx > -1) {
-                    currentReceipts[idx].isDeleted = true;
-                    currentReceipts[idx].status = 'deleted';
-                    localStorage.setItem('localReceiptsDB', JSON.stringify(currentReceipts));
-                    receipts.value = currentReceipts;
-                }
-                
+                db.collection('delivery_receipts').doc(id).update({ isDeleted: true, status: 'deleted' }).catch(() => {
+                    db.collection('delivery_receipts').doc(id).delete().catch(() => {});
+                });
                 Swal.fire({ icon: 'success', title: 'تم الحذف', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             }
         };
 
         onMounted(() => {
-            const currentReceipts = JSON.parse(localStorage.getItem('localReceiptsDB') || '[]');
-            receipts.value = currentReceipts;
+            db.collection('delivery_receipts').orderBy('timestamp', 'desc').limit(300)
+              .onSnapshot(snap => {
+                  const arr = [];
+                  snap.forEach(doc => arr.push({ id: doc.id, ...doc.data() }));
+                  receipts.value = arr;
+              });
         });
 
         return {
-            clients, delegates, drivers, form, isSubmitting, receipts, tab, searchQuery,
+            clientNames, delegates, drivers, form, isSubmitting, receipts, tab, searchQuery, showModal,
             currentBranches, filteredReceipts, pendingCount, archivedCount,
             saveLocal, onClientChange, submitReceipt, markAsArchived, softDelete
         };
     }
-}).mount('#app');
+});
+
+app.component('custom-select', {
+    props: ['modelValue', 'options', 'placeholder', 'icon', 'disabled'],
+    emits: ['update:modelValue', 'change'],
+    template: `
+        <div class="input-group" :class="{'opacity-50 pointer-events-none': disabled}" v-click-outside="close">
+            <i :class="icon"></i>
+            <div @click="open = !open" class="premium-input flex justify-between items-center" style="padding-right: 48px; padding-left: 16px;">
+                <span :class="modelValue ? 'text-slate-800' : 'text-slate-400'">{{ modelValue || placeholder }}</span>
+                <i class="fa-solid fa-chevron-down text-sm" style="position: static; transform: none; color: #cbd5e1;"></i>
+            </div>
+            
+            <transition name="fade">
+                <div v-if="open" class="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 max-h-64 flex flex-col overflow-hidden" style="top: 100%;">
+                    <div class="p-2 border-b border-slate-50 bg-slate-50/50">
+                        <div class="relative">
+                            <input ref="searchInput" v-model="search" type="text" class="w-full bg-white rounded-lg px-3 py-2 pr-9 text-sm outline-none border border-slate-200 focus:border-primary" placeholder="ابحث هنا...">
+                            <i class="fa-solid fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%);"></i>
+                        </div>
+                    </div>
+                    <ul class="overflow-y-auto flex-1">
+                        <li v-if="filtered.length === 0" class="px-4 py-3 text-slate-400 text-sm text-center">لا توجد نتائج</li>
+                        <li v-for="opt in filtered" :key="opt" @click="select(opt)" 
+                            class="px-4 py-3 hover:bg-indigo-50 cursor-pointer transition-colors text-sm" 
+                            :class="{'bg-indigo-50 text-indigo-700 font-bold': modelValue === opt}">
+                            {{ opt }}
+                        </li>
+                    </ul>
+                </div>
+            </transition>
+        </div>
+    `,
+    setup(props, {emit}) {
+        const { ref, computed, watch, nextTick } = Vue;
+        const open = ref(false);
+        const search = ref('');
+        const searchInput = ref(null);
+
+        const filtered = computed(() => {
+            if(!search.value) return props.options || [];
+            const q = search.value.toLowerCase();
+            return (props.options || []).filter(o => String(o).toLowerCase().includes(q));
+        });
+
+        const select = (val) => {
+            emit('update:modelValue', val);
+            emit('change');
+            open.value = false;
+        };
+        const close = () => { open.value = false; };
+
+        watch(open, (val) => {
+            if(val) {
+                search.value = '';
+                nextTick(() => { if(searchInput.value) searchInput.value.focus(); });
+            }
+        });
+
+        return { open, search, searchInput, filtered, select, close };
+    }
+});
+
+// Custom Directive for clicking outside
+app.directive('click-outside', {
+    mounted(el, binding) {
+        el.clickOutsideEvent = function(event) {
+            if (!(el === event.target || el.contains(event.target))) {
+                binding.value(event);
+            }
+        };
+        document.body.addEventListener('click', el.clickOutsideEvent);
+    },
+    unmounted(el) {
+        document.body.removeEventListener('click', el.clickOutsideEvent);
+    }
+});
+
+app.mount('#app');
 </script>
 </body>
 </html>
