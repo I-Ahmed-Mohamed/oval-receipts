@@ -144,7 +144,7 @@
                             <div class="text-sm font-black text-slate-700"><i class="fa-regular fa-clock text-primary"></i> {{ item.timeStr }}</div>
                         </div>
                         <div class="w-full flex gap-2">
-                            <button v-if="tab === 'pending'" @click="markAsArchived(item.id)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-sm">
+                            <button v-if="tab === 'pending'" @click="markAsArchived(item)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-sm">
                                 <i class="fa-solid fa-check"></i> استلمت
                             </button>
                             <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 px-4 rounded-xl transition-all border border-rose-200 text-sm">
@@ -303,7 +303,13 @@ const app = createApp({
                 };
 
                 db.collection('delivery_receipts').add(payload).catch(console.error);
-                Swal.fire({ icon: 'success', title: 'تم التسجيل', text: 'تم تسجيل الإذن بنجاح', timer: 1500, showConfirmButton: false });
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: 'تم التسجيل يا أبطال! 🎉', 
+                    html: `شكراً يا <b>${form.value.delegate}</b> وشكراً للسواق <b>${form.value.driver}</b>.<br><br><span style="color:#ef4444; font-weight:bold; font-size:1.1em;">أحمد محمد بيحبكم! ❤️</span>`, 
+                    confirmButtonText: 'حبيبي يا كابتن',
+                    confirmButtonColor: '#4f46e5'
+                });
                 
                 form.value.client = ''; form.value.branch = ''; form.value.notes = ''; form.value.date = '';
                 currentView.value = 'list';
@@ -315,10 +321,16 @@ const app = createApp({
             }
         };
 
-        const markAsArchived = async (id) => {
+        const markAsArchived = async (item) => {
             try {
-                await db.collection('delivery_receipts').doc(id).update({ status: 'archived', archivedAt: new Date().toISOString() });
-                Swal.fire({ icon: 'success', title: 'تم الأرشفة', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+                await db.collection('delivery_receipts').doc(item.id).update({ status: 'archived', archivedAt: new Date().toISOString() });
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: 'عاش يا رجالة! 💪', 
+                    html: `تسلم إيدك يا <b>${item.delegate}</b> أنت و <b>${item.driver}</b>.<br><br><span style="color:#ef4444; font-weight:bold; font-size:1.1em;">أحمد محمد بيحبكم! ❤️</span>`, 
+                    confirmButtonText: 'تسلم يا غالي',
+                    confirmButtonColor: '#10b981'
+                });
             } catch(e) { Swal.fire({ icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء الأرشفة.' }); }
         };
 
@@ -364,55 +376,49 @@ app.component('custom-select', {
             
             
             <!-- Desktop Dropdown & Mobile Bottom Sheet -->
+            
+            <!-- Universal Bottom Sheet -->
             <teleport to="body">
-                <!-- Overlay for Mobile -->
                 <transition name="fade">
-                    <div v-if="open" @click="close" class="fixed inset-0 bg-slate-900/40 z-[90] sm:hidden backdrop-blur-sm"></div>
+                    <div v-if="open" @click="close" class="fixed inset-0 bg-slate-900/50 z-[90] backdrop-blur-sm"></div>
                 </transition>
 
                 <transition name="slide-up">
-                    <div v-if="open" class="fixed sm:absolute z-[100] sm:z-50 inset-x-0 bottom-0 sm:inset-auto sm:top-auto sm:mt-2 w-full sm:w-[var(--parent-width)] bg-white sm:rounded-xl rounded-t-3xl shadow-2xl border border-slate-100 max-h-[85vh] sm:max-h-64 flex flex-col overflow-hidden" :style="smStyle">
+                    <div v-if="open" class="fixed z-[100] inset-x-0 bottom-0 w-full md:max-w-2xl mx-auto bg-white rounded-t-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.15)] border-t border-slate-100 max-h-[85vh] flex flex-col overflow-hidden">
                         
-                        <!-- Mobile Handle -->
-                        <div class="w-full flex justify-center py-3 sm:hidden bg-slate-50 border-b border-slate-100 cursor-pointer" @click="close">
-                            <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+                        <!-- Drag Handle -->
+                        <div class="w-full flex justify-center py-4 bg-slate-50 border-b border-slate-100 cursor-pointer" @click="close">
+                            <div class="w-16 h-1.5 bg-slate-300 rounded-full"></div>
                         </div>
 
-                        <div class="p-3 sm:p-2 border-b border-slate-50 bg-slate-50/50">
+                        <!-- Search Box -->
+                        <div class="p-4 border-b border-slate-50 bg-slate-50/50">
                             <div class="relative">
-                                <input ref="searchInput" v-model="search" type="text" class="w-full bg-white rounded-xl sm:rounded-lg px-4 py-3 sm:py-2 pr-10 text-base sm:text-sm outline-none border border-slate-200 focus:border-primary shadow-sm" placeholder="ابحث هنا...">
-                                <i class="fa-solid fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                                <input ref="searchInput" v-model="search" type="text" class="w-full bg-white rounded-xl px-5 py-4 pr-12 text-lg font-medium outline-none border-2 border-slate-200 focus:border-primary shadow-sm transition-all" placeholder="ابحث هنا...">
+                                <i class="fa-solid fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
                             </div>
                         </div>
-                        <ul class="overflow-y-auto flex-1 pb-6 sm:pb-0">
-                            <li v-if="filtered.length === 0" class="px-5 py-4 text-slate-400 text-sm text-center">لا توجد نتائج</li>
+
+                        <!-- List -->
+                        <ul class="overflow-y-auto flex-1 pb-8">
+                            <li v-if="filtered.length === 0" class="px-6 py-8 text-slate-400 text-lg text-center font-medium">لا توجد نتائج</li>
                             <li v-for="opt in filtered" :key="opt" @click="select(opt)" 
-                                class="px-5 py-4 sm:py-3 hover:bg-indigo-50 cursor-pointer transition-colors text-base sm:text-sm border-b border-slate-50 last:border-0" 
+                                class="px-6 py-5 hover:bg-indigo-50 cursor-pointer transition-colors text-lg border-b border-slate-50 last:border-0 flex items-center justify-between" 
                                 :class="{'bg-indigo-50 text-indigo-700 font-bold': modelValue === opt}">
-                                {{ opt }}
-                                <i v-if="modelValue === opt" class="fa-solid fa-check float-left text-indigo-600 mt-1"></i>
+                                <span>{{ opt }}</span>
+                                <i v-if="modelValue === opt" class="fa-solid fa-check text-indigo-600 text-xl"></i>
                             </li>
                         </ul>
                     </div>
                 </transition>
             </teleport>
 
+
         </div>
     `,
     setup(props, {emit}) {
         const { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } = Vue;
         const containerRef = ref(null);
-        const smStyle = ref({});
-        
-        const updatePosition = () => {
-            if(!containerRef.value || window.innerWidth < 640) return;
-            const rect = containerRef.value.getBoundingClientRect();
-            smStyle.value = {
-                '--parent-width': rect.width + 'px',
-                top: (rect.bottom + window.scrollY) + 'px',
-                left: rect.left + 'px'
-            };
-        };
         const open = ref(false);
         const search = ref('');
         const searchInput = ref(null);
@@ -431,23 +437,18 @@ app.component('custom-select', {
         const close = () => { open.value = false; };
 
         
-        window.addEventListener('resize', updatePosition);
-        window.addEventListener('scroll', updatePosition);
-        onBeforeUnmount(() => {
-            window.removeEventListener('resize', updatePosition);
-            window.removeEventListener('scroll', updatePosition);
-        });
+        
 
         watch(open, (val) => {
             if(val) {
-                updatePosition(); }
+                }
             if(val) {
                 search.value = '';
                 nextTick(() => { if(searchInput.value) searchInput.value.focus(); });
             }
         });
 
-        return { open, search, searchInput, filtered, select, close, containerRef, smStyle };
+        return { open, search, searchInput, filtered, select, close };
     }
 });
 
