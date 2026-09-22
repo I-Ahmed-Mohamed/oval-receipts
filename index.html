@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>أذونات أوفال</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-dark: #172554;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --input-bg: #ffffff;
+    }
+    
+    * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+    
+    body {
+      margin: 0; padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* App Header */
+    .app-header {
+      background: #ffffff;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-bottom: 1px solid var(--border);
+    }
+    .app-header .logo {
+      width: 40px; height: 40px;
+      background: var(--primary);
+      border-radius: 6px;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 20px; color: white;
+    }
+    .app-header h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--text); }
+    .app-header p { margin: 2px 0 0 0; font-size: 13px; font-weight: 600; color: var(--text-light); }
+
+    .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; }
+
+    /* Form Section */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      margin-bottom: 20px;
+    }
+
+    .form-title { margin: 0 0 20px; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .form-title i { color: var(--primary); }
+
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; color: #495057; }
+    
+    .selector-btn {
+      width: 100%; background: var(--input-bg); border: 1px solid #ced4da; border-radius: 4px;
+      padding: 10px 15px; font-size: 15px; font-weight: 600; color: #495057;
+      display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s;
+    }
+    .selector-btn:active { background: #e9ecef; }
+    .selector-btn .value { flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .selector-btn .icon { color: #6c757d; font-size: 16px; }
+    .selector-btn .chevron { color: #adb5bd; font-size: 12px; }
+    
+    .selector-btn.placeholder .value { color: #6c757d; font-weight: 400; }
+
+    input.real-input {
+      width: 100%; background: var(--input-bg); border: 1px solid #ced4da;
+      border-radius: 4px; padding: 10px 40px 10px 15px; font-size: 15px; font-weight: 600;
+      color: var(--text); outline: none; transition: 0.2s;
+    }
+    input.real-input:focus { border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+
+    .btn-submit {
+      width: 100%; background: var(--primary); color: white; border: none;
+      padding: 12px; border-radius: 4px; font-size: 16px; font-weight: 700;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin-top: 20px; transition: 0.2s;
+    }
+    .btn-submit:active { background: var(--primary-dark); }
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* Tabs & History Section */
+    .tabs-wrapper {
+      display: flex; background: var(--surface);
+      border-radius: 4px; padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; text-align: center; padding: 10px; font-size: 14px; font-weight: 700;
+      color: var(--text-light); border-radius: 3px; cursor: pointer; transition: 0.2s;
+    }
+    .tab-btn.active { color: white; background: var(--primary); }
+    .tab-badge { display: inline-block; background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-right: 5px; }
+
+    .history-search { margin-bottom: 15px; position: relative; }
+    .history-search i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d; }
+    .history-search input {
+      width: 100%; background: #fff; border: 1px solid #ced4da; border-radius: 4px; 
+      padding: 10px 40px 10px 15px; font-size: 14px; outline: none; transition: 0.2s;
+    }
+    .history-search input:focus { border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+
+    .history-card {
+      background: var(--surface); border-radius: 6px; padding: 15px; margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #ced4da;
+    }
+    .history-card.archived { background: #f8f9fa; border-color: #dee2e6; color: #6c757d; opacity: 0.85; }
+
+    .hc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .hc-client { font-weight: 700; font-size: 15px; color: var(--text); }
+    
+    .hc-branch { color: var(--primary); font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .archived .hc-branch { color: var(--text-light); }
+
+    .hc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; }
+    .hc-tag { background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #495057; border: 1px solid #ced4da; }
+
+    /* Action Buttons inside Card */
+    .btn-action {
+      flex: 1; background: var(--primary); color: white; border: none;
+      padding: 8px; border-radius: 4px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; transition: 0.2s;
+    }
+    .btn-action:active { background: var(--primary-dark); }
+    
+    .btn-edit {
+      flex: 1; background: #fff; color: #0d6efd; border: 1px solid #0d6efd;
+      padding: 8px; border-radius: 4px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; transition: 0.2s;
+    }
+    .btn-edit:active { background: #0d6efd; color: #fff; }
+
+    .btn-delete {
+      flex: 1; background: #fff; color: #dc3545; border: 1px solid #dc3545;
+      padding: 8px; border-radius: 4px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; transition: 0.2s;
+    }
+    .btn-delete:active { background: #dc3545; color: #fff; }
+    
+    .card-actions { display: flex; gap: 10px; width: 100%; margin-top: 10px; border-top: 1px solid #dee2e6; padding-top: 15px; }
+
+    .archived-badge {
+      display: flex; justify-content: center; align-items: center; gap: 5px;
+      background: #e9ecef; color: #6c757d; padding: 8px; border-radius: 4px;
+      font-size: 13px; font-weight: 700; flex: 1; border: 1px solid #ced4da;
+    }
+
+    /* Bottom Sheet */
+    .sheet-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); 
+      z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+    
+    .bottom-sheet {
+      position: fixed; bottom: -100%; left: 0; right: 0; max-height: 85vh;
+      background: var(--surface); border-radius: 12px 12px 0 0;
+      z-index: 10001; transition: bottom 0.3s ease;
+      display: flex; flex-direction: column; box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    }
+    .bottom-sheet.active { bottom: 0; }
+    
+    .sheet-handle { width: 40px; height: 5px; background: #dee2e6; border-radius: 5px; margin: 10px auto; }
+    
+    .sheet-header { padding: 0 20px 15px; border-bottom: 1px solid var(--border); }
+    .sheet-header h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; text-align: center; color: var(--text); }
+    
+    .search-box { position: relative; }
+    .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 14px; }
+    .search-box input {
+      width: 100%; background: #fff; border: 1px solid #ced4da;
+      border-radius: 4px; padding: 10px 35px 10px 15px; font-size: 15px; outline: none; transition: 0.2s;
+    }
+    .search-box input:focus { border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+
+    .sheet-content { flex: 1; overflow-y: auto; padding: 0 20px 20px; min-height: 250px; }
+    
+    .list-item {
+      padding: 12px 10px; border-bottom: 1px solid #e9ecef;
+      font-size: 15px; font-weight: 600; color: var(--text);
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; 
+    }
+    .list-item:active { background: #f8f9fa; }
+    .list-item i { color: #adb5bd; font-size: 14px; display: none; }
+    .list-item.selected { color: var(--primary); background: #f8f9fa; }
+    .list-item.selected i { display: block; color: var(--primary); }
+    .list-item.hidden { display: none !important; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+      background: #343a40; color: #fff; padding: 12px 20px; border-radius: 4px;
+      font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: bottom 0.3s; z-index: 1000;
+    }
+    .toast.show { bottom: 20px; }
+    .toast i { color: #28a745; font-size: 18px; }
+
+    @media (min-width: 900px) {
+      .container { max-width: 1200px; padding: 40px 24px; }
+      .desktop-grid {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+      .form-column { display: block !important; }
+      #formView { display: block !important; }
+      #newReceiptBtn { display: none !important; }
+      .history-column { display: block !important; }
+      .mobile-only-header { display: none; }
+    }
+    @media (max-width: 899px) {
+      .history-column { display: block; }
+      .desktop-grid { display: block; }
+      .container { padding: 20px 15px; }
+    }
+  </style>
+</head>
+<body>
+
+
+
+  <header class="app-header">
+    <div class="logo"><i class="fa-solid fa-file-signature"></i></div>
+    <div>
+      <h1>أذونات أوفال</h1>
+      <p>تسجيل الأذونات وتأكيد الاستلام</p>
+    </div>
+  </header>
+
+  <div class="container desktop-grid">
+    <button id="newReceiptBtn" onclick="openFormModal()" class="btn-primary" style="width:100%; margin-bottom:24px; font-size:18px; font-weight:700; padding:16px; border-radius:8px; background:var(--primary); border:none; color:#ffffff !important;"><i class="fa-solid fa-plus-circle" style="margin-left:8px; color:#ffffff !important;"></i> تسجيل إذن جديد</button>
+
+    <div id="formView" style="display:none; animation:fadeIn 0.3s forwards;">
+      <div class="form-column" style="width:100%; max-width:100%; margin:auto;">
+        <div class="form-card" id="formCard" style="margin-bottom:0; box-shadow:0 15px 35px rgba(0,0,0,0.1);">
+        <h2 class="form-title" id="formTitle"><i class="fa-solid fa-plus-circle" style="color:var(--primary);"></i> إذن جديد (تم تركه بالفرع)</h2>
+      
+      <form id="receiptForm">
+        <div class="form-group">
+          <label>اسم المندوب</label>
+          <div class="selector-btn placeholder" id="btnDelegate" onclick="openSheet('delegate')">
+            <i class="fa-solid fa-user-tie icon"></i>
+            <span class="value" id="valDelegate">اختر المندوب...</span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>اسم السائق</label>
+          <div class="selector-btn placeholder" id="btnDriver" onclick="openSheet('driver')">
+            <i class="fa-solid fa-truck icon"></i>
+            <span class="value" id="valDriver">اختر السائق...</span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>العميل</label>
+          <div class="selector-btn placeholder" id="btnClient" onclick="openSheet('client')">
+            <i class="fa-solid fa-building icon"></i>
+            <span class="value" id="valClient">ابحث واختر العميل...</span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>تاريخ الإذن (اختياري - افتراضي اليوم)</label>
+          <div style="position:relative;">
+            <input type="date" id="receiptDateInput" class="real-input" style="padding-right: 40px; color: #475569;">
+            <i class="fa-regular fa-calendar-days" style="position:absolute; right:15px; top:16px; color:#94a3b8; font-size: 16px;"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>الفرع</label>
+          <div class="selector-btn placeholder" id="btnBranch" onclick="openSheet('branch')" style="opacity: 0.6; pointer-events: none;">
+            <i class="fa-solid fa-location-dot icon"></i>
+            <span class="value" id="valBranch">اختر العميل أولاً...</span>
+            <i class="fa-solid fa-chevron-down chevron"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ملاحظات (رقم بوليصة / تفاصيل)</label>
+          <div style="position:relative;">
+            <input type="text" id="notesInput" class="real-input" placeholder="اكتب هنا إذا لزم الأمر...">
+            <i class="fa-solid fa-pen" style="position:absolute; right:15px; top:15px; color:#cbd5e1;"></i>
+          </div>
+        </div>
+
+        <button type="button" id="submitBtn" class="btn-submit" onclick="submitReceipt()">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span id="submitBtnText">تسجيل الإذن في النظام</span>
+        </button>
+        <button type="button" id="cancelEditBtn" class="btn-submit" onclick="cancelEdit()" style="background:#f1f5f9; color:#475569; display:none; margin-top:10px; box-shadow:none;">
+          <i class="fa-solid fa-xmark"></i>
+          إلغاء التعديل
+        </button>
+      </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-column" id="historyColumn">
+    <!-- Tabs -->
+    <div class="tabs-wrapper">
+      <div class="tab-btn active" id="tabPending" onclick="switchTab('pending')">
+        المعلقة <span class="tab-badge" id="countPending">0</span>
+      </div>
+      <div class="tab-btn" id="tabArchive" onclick="switchTab('archive')">
+        الأرشيف <span class="tab-badge" id="countArchive">0</span>
+      </div>
+    </div>
+
+    <div class="history-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" id="historySearch" placeholder="ابحث في الأذونات..." oninput="filterHistory()">
+    </div>
+
+    <div id="historyList">
+      <div style="text-align:center; padding:20px; color:var(--text-light); font-weight:600;">جاري التحميل...</div>
+    </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Sheet -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="sheetTitle">اختر...</h3>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="sheetSearch" placeholder="بحث سريع..." oninput="filterSheetList()">
+      </div>
+    </div>
+    <div class="sheet-content" id="sheetList"></div>
+  </div>
+
+  <div id="toast" class="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">تم الإرسال بنجاح!</span>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+// Firebase Configuration — Oval OS
+// ⚠️ Replace with your actual Firebase project config
+const firebaseConfig = {
+  apiKey: "AIzaSyD-jjWt232onP_KgBamRXd0gCELzIn2sLw",
+  authDomain: "oval-os.firebaseapp.com",
+  projectId: "oval-os"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const firestore = firebase.firestore();
+firebase.firestore().enablePersistence({synchronizeTabs:true}).catch(function(err){console.warn(err);});
+
+
+// الاحتفاظ بالملف القديم للتحميل الاحتياطي
+window.DB_DOC = firestore.collection('oval_os').doc('db_data_v13');
+
+// المتغير الجديد للمجلد المجزأ
+window.CLOUD_DB = firestore;
+
+// Connection status
+let cloudReady = false;
+let realtimeActive = false;
+
+// Cloud sync disabled — localStorage only mode
+// DB_DOC.get().then(() => {
+//   cloudReady = true;
+//   console.log('☁️ Firebase connected successfully');
+// }).catch(e => {
+//   cloudReady = false;
+//   console.warn('⚠️ Firebase connection failed — using localStorage only:', e.message);
+// });
+console.log('💾 Running in localStorage-only mode');
+
+</script>
+
+  <script>
+    let masterData = { clients: [], delegates: [], drivers: [], branches: [] };
+
+    function openFormModal() {
+      if(window.innerWidth >= 900) return; // Desktop is always visible
+      document.getElementById('formView').style.display = 'block';
+      document.getElementById('historyColumn').style.display = 'none';
+      document.getElementById('newReceiptBtn').style.display = 'none';
+      document.querySelector('.app-header h1').textContent = 'تسجيل إذن';
+      const p = document.querySelector('.app-header p');
+      p.innerHTML = '<i class="fa-solid fa-arrow-right"></i> رجوع للقائمة';
+      p.style.cursor = 'pointer';
+      p.style.color = 'var(--primary)';
+      p.style.fontWeight = 'bold';
+      p.onclick = closeFormModal;
+      window.scrollTo(0,0);
+    }
+    function closeFormModal() {
+      if(window.innerWidth >= 900) return;
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('historyColumn').style.display = 'block';
+      document.getElementById('newReceiptBtn').style.display = 'block';
+      document.querySelector('.app-header h1').textContent = 'أذونات أوفال';
+      const p = document.querySelector('.app-header p');
+      p.innerHTML = 'تسجيل الأذونات وتأكيد الاستلام';
+      p.onclick = null;
+      p.style.color = 'var(--text-light)';
+      p.style.fontWeight = 'normal';
+      if(editModeId) cancelEdit();
+    }
+    let currentSelection = { clientIdx: null, branch: null, delegate: null, driver: null };
+    
+    let allReceipts = [];
+    let currentTab = 'pending'; // 'pending' | 'archive'
+    let editModeId = null;
+    
+    const todayStr = new Date().toLocaleDateString('ar-EG', {year:'numeric', month:'2-digit', day:'2-digit'});
+
+    function personCanonical(x){ return String(x||'').trim().replace(/ى/g,'ي').replace(/أ|إ|آ/g,'ا').replace(/ة/g,'ه').replace(/\s+/g,' '); }
+    function uniqueClean(arr){ const seen=new Set(), out=[]; (arr||[]).forEach(v=>{ const name=String(v||'').trim(); const key=personCanonical(name); if(name && !seen.has(key)){ seen.add(key); out.push(name); } }); return out; }
+    function normalizeClientName(x){
+      x = String(x||'').trim();
+      if(['أخرى','اخري','اخرى','other'].includes(x.toLowerCase())) return 'غير مصنف';
+      const rules = [[/محمود\s*الفار|الفار/i,'الفار'],[/كارفور|كرفور|مول\s*مصر|الواحات|نيو\s*كا[يئب]رو|نيو\s*كايرو|سيراميكا\s*كليوباترا|نيو\s*المعادي|العجمي/i,'كارفور'],[/سبينس|spinneys|جري\s*بروجيكت|العربية/i,'سبينس'],[/امازون|أمازون|amazon|ارض\s*الجولف|أرض\s*الجولف/i,'أمازون'],[/أوسكار|اوسكار/i,'أوسكار'],[/بندة|panda/i,'بندة'],[/اللولو|lulu/i,'اللولو'],[/[اأو]ولاد|ولاد\s*رجب|ولاج\s*رجب|بني\s*سويف/i,'أولاد رجب'],[/سوبيكو|النعام|السيوف|الياسمين|الفيوم|الأزهر|الازهر|شينزو\s*ا[بئ]ي|ميجا\s*مول|بدر|وينجت|المطار|سنجر\s*شبرا|الملتق[يى]|سوشن|سيتي\s*مول|زكي\s*رجب/i,'سوبيكو'],[/جيان/i,'جيان']];
+      for(const [r,s] of rules) if(r.test(x)) return s;
+      return x || 'غير محدد';
+    }
+
+    async function loadData() {
+      try {
+        const col = CLOUD_DB.collection('oval_os_v13_split');
+        const [clientsDoc, delegatesDoc, driversDoc, employeesDoc] = await Promise.all([
+          col.doc('clients').get(), col.doc('delegates').get(), col.doc('drivers').get(), col.doc('employees').get()
+        ]);
+
+        if(clientsDoc.exists) {
+          let rawClients = clientsDoc.data().data || [];
+          const uniqueClients = {};
+          rawClients.forEach(c => {
+            const cName = normalizeClientName(c.client || c.name);
+            if(!uniqueClients[cName]) uniqueClients[cName] = { client: cName, branches: [] };
+            if(Array.isArray(c.branches)) {
+              c.branches.forEach(b => {
+                const bName = typeof b === 'string' ? b : (b.name || '');
+                if(bName && !uniqueClients[cName].branches.includes(bName)) uniqueClients[cName].branches.push(bName);
+              });
+            }
+          });
+          masterData.clients = Object.values(uniqueClients)
+            .filter(c => c.client !== 'غير محدد' && c.client !== 'غير مصنف')
+            .sort((a,b) => a.client.localeCompare(b.client, 'ar'));
+        }
+
+        let delegates = delegatesDoc.exists ? (delegatesDoc.data().data || []) : [];
+        let drivers = driversDoc.exists ? (driversDoc.data().data || []) : [];
+        if(delegates.length === 0 || drivers.length === 0) {
+           if(employeesDoc.exists) {
+             const emps = employeesDoc.data().data || [];
+             if(delegates.length===0) delegates = emps.filter(e => (e.job||'').includes('مندوب')).map(e => e.name);
+             if(drivers.length===0) drivers = emps.filter(e => (e.job||'').includes('سواق')).map(e => e.name);
+           }
+        }
+        masterData.delegates = uniqueClean(delegates).sort((a,b)=>a.localeCompare(b,'ar'));
+        masterData.drivers = uniqueClean(drivers).sort((a,b)=>a.localeCompare(b,'ar'));
+
+        startHistoryListener();
+        if (localStorage.getItem('savedReceiptDelegate')) {
+          currentSelection.delegate = localStorage.getItem('savedReceiptDelegate');
+          setBtnState('btnDelegate', 'valDelegate', currentSelection.delegate);
+        }
+        if (localStorage.getItem('savedReceiptDriver')) {
+          currentSelection.driver = localStorage.getItem('savedReceiptDriver');
+          setBtnState('btnDriver', 'valDriver', currentSelection.driver);
+        }
+      } catch(e) {
+        console.error(e);
+        alert('حدث خطأ في تحميل البيانات. يرجى التأكد من اتصال الإنترنت.');
+      }
+    }
+
+    // --- Bottom Sheet Logic ---
+    function openSheet(type) {
+      activeSheetType = type;
+      const titleEl = document.getElementById('sheetTitle');
+      const listEl = document.getElementById('sheetList');
+      const searchEl = document.getElementById('sheetSearch');
+      
+      searchEl.value = '';
+      listEl.innerHTML = '';
+      
+      let items = [];
+      let selectedVal = null;
+
+      if(type === 'delegate') {
+        titleEl.textContent = 'اختر المندوب';
+        items = masterData.delegates.map((d,i) => ({ label: d, value: d }));
+        selectedVal = currentSelection.delegate;
+      } else if(type === 'driver') {
+        titleEl.textContent = 'اختر السائق';
+        items = masterData.drivers.map((d,i) => ({ label: d, value: d }));
+        selectedVal = currentSelection.driver;
+      } else if(type === 'client') {
+        titleEl.textContent = 'اختر العميل';
+        items = masterData.clients.map((c,i) => ({ label: c.client, value: i }));
+        selectedVal = currentSelection.clientIdx;
+      } else if(type === 'branch') {
+        titleEl.textContent = 'اختر الفرع';
+        items = masterData.branches.map((b,i) => ({ label: b, value: b }));
+        selectedVal = currentSelection.branch;
+      }
+
+      if(items.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">لا يوجد بيانات</div>';
+      } else {
+        items.forEach(item => {
+          const isSelected = selectedVal !== null && selectedVal == item.value;
+          listEl.innerHTML += `
+            <div class="list-item ${isSelected ? 'selected' : ''}" onclick="selectItem('${item.value}', '${item.label.replace(/'/g, "\\'")}')">
+              <span>${item.label}</span>
+              <i class="fa-solid fa-check"></i>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('sheetOverlay').classList.add('active');
+      document.getElementById('bottomSheet').classList.add('active');
+      setTimeout(() => searchEl.focus(), 300);
+    }
+
+    function closeSheet() {
+      document.getElementById('sheetOverlay').classList.remove('active');
+      document.getElementById('bottomSheet').classList.remove('active');
+      document.getElementById('sheetSearch').blur();
+    }
+
+    function filterSheetList() {
+      const q = document.getElementById('sheetSearch').value.toLowerCase();
+      const items = document.querySelectorAll('#sheetList .list-item');
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if(text.includes(q)) item.classList.remove('hidden');
+        else item.classList.add('hidden');
+      });
+    }
+
+    function selectItem(value, label) {
+      closeSheet();
+      
+      if(activeSheetType === 'delegate') {
+        currentSelection.delegate = value;
+        localStorage.setItem('savedReceiptDelegate', value);
+        setBtnState('btnDelegate', 'valDelegate', label);
+      } else if(activeSheetType === 'driver') {
+        currentSelection.driver = value;
+        localStorage.setItem('savedReceiptDriver', value);
+        setBtnState('btnDriver', 'valDriver', label);
+      } else if(activeSheetType === 'client') {
+        currentSelection.clientIdx = value;
+        setBtnState('btnClient', 'valClient', label);
+        
+        currentSelection.branch = null;
+        setBtnState('btnBranch', 'valBranch', 'اختر الفرع...', true);
+        const branchBtn = document.getElementById('btnBranch');
+        branchBtn.style.opacity = '1';
+        branchBtn.style.pointerEvents = 'auto';
+        
+        const client = masterData.clients[value];
+        masterData.branches = (client.branches || []).sort((a,b)=>a.localeCompare(b,'ar'));
+        
+        setTimeout(() => openSheet('branch'), 400);
+      } else if(activeSheetType === 'branch') {
+        currentSelection.branch = value;
+        setBtnState('btnBranch', 'valBranch', label);
+      }
+    }
+
+    function setBtnState(btnId, valId, text, isPlaceholder = false) {
+      const btn = document.getElementById(btnId);
+      const val = document.getElementById(valId);
+      val.textContent = text;
+      if(isPlaceholder) btn.classList.add('placeholder');
+      else btn.classList.remove('placeholder');
+    }
+
+    // --- Submission ---
+    async function submitReceipt() {
+      if(!currentSelection.delegate || !currentSelection.driver || currentSelection.clientIdx === null || !currentSelection.branch) {
+        alert("الرجاء استكمال جميع البيانات الأساسية (المندوب، السائق، العميل، الفرع).");
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الإرسال...';
+      
+      const clientName = masterData.clients[currentSelection.clientIdx].client;
+      const notes = document.getElementById('notesInput').value;
+      const now = new Date();
+      
+      let selectedDate = document.getElementById('receiptDateInput').value;
+      let finalDateStr = todayStr;
+      if(selectedDate) {
+         // Create date and manually format to ar-EG
+         const parts = selectedDate.split('-');
+         finalDateStr = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+         // Example formatting DD/MM/YYYY since toLocaleDateString might be inconsistent
+      }
+
+      const receiptData = {
+        client: clientName,
+        branch: currentSelection.branch,
+        delegate: currentSelection.delegate,
+        driver: currentSelection.driver,
+        notes: notes,
+        status: 'pending_review',
+        timestamp: now.toISOString(),
+        dateStr: finalDateStr,
+        timeStr: now.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', hour12:true})
+      };
+
+      try {
+        if(editModeId) {
+          await CLOUD_DB.collection('delivery_receipts').doc(editModeId).update(receiptData);
+          showToast('تم تعديل الإذن بنجاح!');
+          cancelEdit();
+        } else {
+          await CLOUD_DB.collection('delivery_receipts').add(receiptData);
+          showToast('تم تسجيل الإذن كمعلق!');
+          
+          currentSelection.clientIdx = null;
+          currentSelection.branch = null;
+          masterData.branches = [];
+          setBtnState('btnClient', 'valClient', 'ابحث واختر العميل...', true);
+          setBtnState('btnBranch', 'valBranch', 'اختر العميل أولاً...', true);
+          document.getElementById('btnBranch').style.opacity = '0.6';
+          document.getElementById('btnBranch').style.pointerEvents = 'none';
+          document.getElementById('notesInput').value = '';
+          document.getElementById('receiptDateInput').value = '';
+          closeFormModal();
+          
+          // Auto switch to pending tab to see it
+          switchTab('pending');
+          window.scrollTo({top: document.querySelector('.tabs-wrapper').offsetTop - 80, behavior: 'smooth'});
+        }
+
+      } catch(err) {
+        console.error(err);
+        alert('حدث خطأ أثناء الإرسال. تأكد من الإنترنت.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // --- History & Archive ---
+    function startHistoryListener() {
+      // Fetch latest 150 receipts to bypass needing custom composite indexes.
+      // This will ensure we get recent pending and archived easily.
+      const q = CLOUD_DB.collection('delivery_receipts').orderBy('timestamp', 'desc').limit(200);
+      
+      q.onSnapshot((snapshot) => {
+        allReceipts = [];
+        snapshot.forEach(doc => {
+          allReceipts.push({ id: doc.id, ...doc.data() });
+        });
+        updateCountsAndRender();
+      }, err => {
+        console.error("History Error:", err);
+        // Fallback if orderBy fails due to missing basic index (unlikely for a single field, but just in case)
+        const qFallback = CLOUD_DB.collection('delivery_receipts').limit(200);
+        qFallback.onSnapshot(snap => {
+            allReceipts = [];
+            snap.forEach(doc => allReceipts.push({ id: doc.id, ...doc.data() }));
+            allReceipts.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            updateCountsAndRender();
+        });
+      });
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tabPending').classList.toggle('active', tab === 'pending');
+      document.getElementById('tabArchive').classList.toggle('active', tab === 'archive');
+      
+      // Expand/collapse form card to focus on lists if desired, but we can leave it
+      if(tab === 'archive') {
+         document.getElementById('formCard').style.display = 'none';
+      } else {
+         document.getElementById('formCard').style.display = 'block';
+      }
+
+      renderHistory();
+    }
+
+    function updateCountsAndRender() {
+      const pendingCount = allReceipts.filter(d => d.status === 'pending_review').length;
+      const archiveCount = allReceipts.filter(d => d.status === 'archived').length;
+      
+      document.getElementById('countPending').textContent = pendingCount;
+      document.getElementById('countArchive').textContent = archiveCount;
+      
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const listEl = document.getElementById('historyList');
+      const q = document.getElementById('historySearch').value.toLowerCase();
+      
+      const isPendingTab = currentTab === 'pending';
+      const statusFilter = isPendingTab ? 'pending_review' : 'archived';
+
+      const filtered = allReceipts.filter(d => 
+        (d.status === statusFilter || (!d.status && isPendingTab)) &&
+        ((d.client||'').toLowerCase().includes(q) || 
+         (d.branch||'').toLowerCase().includes(q) || 
+         (d.delegate||'').toLowerCase().includes(q) || 
+         (d.driver||'').toLowerCase().includes(q) ||
+         (d.notes||'').toLowerCase().includes(q))
+      );
+
+      if(filtered.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align:center; padding:40px 20px; background:#fff; border-radius:20px; border:1px dashed var(--border);">
+            <i class="fa-solid ${isPendingTab ? 'fa-hourglass-half' : 'fa-box-archive'}" style="font-size:36px; color:#cbd5e1; margin-bottom:12px;"></i>
+            <p style="margin:0; font-weight:700; color:var(--text-light);">${isPendingTab ? 'لا يوجد أذونات معلقة حالياً' : 'الأرشيف فارغ أو لا يطابق البحث'}</p>
+          </div>`;
+        return;
+      }
+
+      let html = '';
+      
+      const grouped = {};
+      filtered.forEach(d => {
+         let cName = (d.client || 'بدون عميل').trim();
+         let bName = (d.branch || 'بدون فرع').trim();
+
+         // --- Auto Normalize Oscar Branches ---
+         if (cName.includes('وسكار')) cName = 'أوسكار';
+         if (bName.includes('وسكار')) {
+             if (bName.includes('معاد')) bName = 'أوسكار المعادي';
+             if (bName.includes('دينت')) bName = 'أوسكار مدينتي';
+             if (bName.includes('تجمع')) bName = 'أوسكار التجمع';
+             if (bName.includes('يتاب')) bName = 'أوسكار ايتابا';
+             if (bName.includes('زاي')) bName = 'أوسكار زايد';
+         } else if (cName === 'أوسكار') {
+             if (bName.includes('معاد')) bName = 'أوسكار المعادي';
+             if (bName.includes('دينت')) bName = 'أوسكار مدينتي';
+             if (bName.includes('تجمع')) bName = 'أوسكار التجمع';
+             if (bName.includes('يتاب')) bName = 'أوسكار ايتابا';
+             if (bName.includes('زاي')) bName = 'أوسكار زايد';
+         }
+         // -------------------------------------
+
+         const groupKey = cName + ' - ' + bName;
+         if(!grouped[groupKey]) grouped[groupKey] = [];
+         grouped[groupKey].push(d);
+      });
+      
+      Object.keys(grouped).sort().forEach((gKey, idx) => {
+        const groupCount = grouped[gKey].length;
+        const groupId = 'group_' + idx;
+        html += `
+          <div onclick="toggleGroup('${groupId}')" style="cursor: pointer; margin-top: 20px; margin-bottom: 10px; background: #ffffff; color: var(--text); padding: 12px 15px; border-radius: 6px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); transition: background 0.2s;">
+            <div style="display:flex; align-items:center; gap:10px; font-size: 15px;">
+              <i class="fa-solid fa-building" style="color: var(--primary); font-size: 16px;"></i> ${gKey}
+            </div>
+            <div style="display:flex; align-items:center; gap: 10px;">
+              <span style="background:var(--primary); color:white; padding:3px 10px; border-radius:10px; font-size:12px; font-weight:700;">${groupCount} إذن</span>
+              <i class="fa-solid fa-chevron-down toggle-icon" id="icon_${groupId}" style="transition: 0.3s; transform: rotate(180deg); color: #6c757d;"></i>
+            </div>
+          </div>
+          <div id="${groupId}" style="display: block; overflow: hidden; transition: max-height 0.3s ease;">
+        `;
+
+        grouped[gKey].forEach(d => {
+          const timeDisplay = d.archivedAt 
+            ? new Date(d.archivedAt).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', hour12:true})
+            : d.timeStr;
+            
+          html += `
+            <div class="history-card ${isPendingTab ? '' : 'archived'}">
+              <div class="hc-top">
+                <span class="hc-tag" style="background:#f8f9fa; border:1px solid #dee2e6; margin:0;"><i class="fa-regular fa-calendar-days" style="color:#6c757d;"></i> ${d.dateStr}</span>
+              </div>
+              <div class="hc-tags">
+                <div class="hc-tag"><i class="fa-solid fa-user-tie" style="color:#0d6efd;"></i> ${d.delegate}</div>
+                <div class="hc-tag"><i class="fa-solid fa-truck" style="color:#fd7e14;"></i> ${d.driver}</div>
+                ${d.notes ? `<div class="hc-tag" style="background:#fff3cd; border-color:#ffe69c; color:#664d03; width:100%;"><i class="fa-solid fa-comment-dots"></i> ${d.notes}</div>` : ''}
+              </div>
+              
+              <div class="card-actions">
+                ${isPendingTab 
+                  ? `
+                     <button class="btn-edit" onclick="editReceipt('${d.id}')">
+                       <i class="fa-solid fa-pen"></i> تعديل
+                     </button>
+                     <button class="btn-action" onclick="archiveReceipt('${d.id}')">
+                       <i class="fa-solid fa-check-circle" style="font-size:15px;"></i> استلمته
+                     </button>
+                    `
+                  : `
+                     <div class="archived-badge">
+                       <i class="fa-solid fa-box-archive" style="color:var(--primary);"></i> تم في (${timeDisplay})
+                     </div>
+                     <button class="btn-delete" onclick="deleteReceipt('${d.id}')">
+                       <i class="fa-solid fa-trash-can"></i> حذف نهائي
+                     </button>
+                    `
+                }
+              </div>
+            </div>
+          `;
+        });
+        
+        html += `</div>`;
+      });
+
+      listEl.innerHTML = html;
+    }
+
+    function toggleGroup(id) {
+      const el = document.getElementById(id);
+      const icon = document.getElementById('icon_' + id);
+      if(el.style.display === 'none') {
+        el.style.display = 'block';
+        if(icon) icon.style.transform = 'rotate(180deg)';
+      } else {
+        el.style.display = 'none';
+        if(icon) icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function filterHistory() { renderHistory(); }
+
+    function editReceipt(docId) {
+      const d = allReceipts.find(r => r.id === docId);
+      if(!d) return;
+      
+      editModeId = docId;
+      document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen" style="color:var(--primary);"></i> تعديل إذن';
+      document.getElementById('submitBtnText').textContent = 'حفظ التعديلات';
+      document.getElementById('cancelEditBtn').style.display = 'flex';
+      
+      // Auto-switch to form view if hidden
+      document.getElementById('formCard').style.display = 'block';
+      openFormModal();
+
+      // Parse date if possible
+      if(d.dateStr) {
+        const parts = d.dateStr.split('/');
+        if(parts.length === 3) {
+          document.getElementById('receiptDateInput').value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      }
+
+      currentSelection.delegate = d.delegate;
+      setBtnState('btnDelegate', 'valDelegate', d.delegate);
+      
+      currentSelection.driver = d.driver;
+      setBtnState('btnDriver', 'valDriver', d.driver);
+      
+      const cIdx = masterData.clients.findIndex(c => c.client === d.client);
+      if(cIdx !== -1) {
+        currentSelection.clientIdx = cIdx;
+        setBtnState('btnClient', 'valClient', d.client);
+        masterData.branches = (masterData.clients[cIdx].branches || []).sort((a,b)=>a.localeCompare(b,'ar'));
+        document.getElementById('btnBranch').style.opacity = '1';
+        document.getElementById('btnBranch').style.pointerEvents = 'auto';
+        
+        currentSelection.branch = d.branch;
+        setBtnState('btnBranch', 'valBranch', d.branch);
+      }
+      
+      document.getElementById('notesInput').value = d.notes || '';
+      
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function cancelEdit() {
+      editModeId = null;
+      document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-plus-circle" style="color:var(--primary);"></i> إذن جديد (تم تركه بالفرع)';
+      document.getElementById('submitBtnText').textContent = 'تسجيل الإذن في النظام';
+      document.getElementById('cancelEditBtn').style.display = 'none';
+      
+      currentSelection.clientIdx = null;
+      currentSelection.branch = null;
+      masterData.branches = [];
+      setBtnState('btnClient', 'valClient', 'ابحث واختر العميل...', true);
+      setBtnState('btnBranch', 'valBranch', 'اختر العميل أولاً...', true);
+      document.getElementById('btnBranch').style.opacity = '0.6';
+      document.getElementById('btnBranch').style.pointerEvents = 'none';
+      document.getElementById('notesInput').value = '';
+      document.getElementById('receiptDateInput').value = '';
+    }
+
+    async function archiveReceipt(docId) {
+      if(!confirm("هل أنت متأكد أنك استلمت أصل الورقة وتريد أرشفة هذا الإذن؟")) return;
+      
+      try {
+        await CLOUD_DB.collection('delivery_receipts').doc(docId).update({
+          status: 'archived',
+          archivedAt: new Date().toISOString()
+        });
+        showToast("تم الاستلام والأرشفة بنجاح! ✅");
+      } catch(err) {
+        console.error(err);
+        alert("حدث خطأ أثناء الأرشفة. تأكد من اتصالك بالإنترنت.");
+      }
+    }
+
+    async function deleteReceipt(docId) {
+      if(!confirm("هل أنت متأكد من حذف هذا الإذن نهائياً من الأرشيف؟")) return;
+      
+      try {
+        let hidden = JSON.parse(localStorage.getItem('hiddenReceipts') || '[]');
+        if(!hidden.includes(docId)) hidden.push(docId);
+        localStorage.setItem('hiddenReceipts', JSON.stringify(hidden));
+        
+        // Try soft delete in cloud (in case hard delete is blocked but updates are allowed)
+        CLOUD_DB.collection('delivery_receipts').doc(docId).update({ isDeleted: true, status: 'deleted' }).catch(e => {
+            // Try hard delete as fallback
+            CLOUD_DB.collection('delivery_receipts').doc(docId).delete().catch(e2 => console.warn('Cloud delete blocked by rules, but hidden locally.'));
+        });
+        
+        showToast("تم الحذف بنجاح! 🗑️");
+        updateCountsAndRender();
+      } catch(err) {
+        console.error(err);
+      }
+    }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    window.onload = loadData;
+  </script>
+  
+</body>
+</html>
