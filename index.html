@@ -112,47 +112,74 @@
                 <p class="text-slate-500">القائمة فارغة أو لا يوجد نتائج تطابق بحثك حالياً.</p>
             </div>
 
-            <div v-for="item in filteredReceipts" :key="item.id" class="premium-card p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform">
-                <div v-if="item.status === 'archived'" class="absolute -left-10 -top-10 bg-emerald-500 w-24 h-24 transform -rotate-45 flex items-end justify-center pb-2 shadow-lg z-10">
-                    <i class="fa-solid fa-check text-white text-xl transform rotate-45"></i>
+            
+            <div v-for="clientGroup in groupedReceipts" :key="clientGroup.name" class="mb-8 animate-fade-in">
+                <!-- Client Header -->
+                <div class="flex items-center justify-between bg-white border border-slate-200 p-4 rounded-2xl mb-4 shadow-sm sticky top-4 z-20">
+                    <h2 class="text-xl font-black text-slate-800 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-primary flex items-center justify-center">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        {{ clientGroup.name }}
+                    </h2>
+                    <span class="bg-primary text-white text-sm font-bold px-4 py-1.5 rounded-full shadow-md">
+                        إجمالي: {{ clientGroup.count }}
+                    </span>
                 </div>
 
-                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary shrink-0">
-                                <i class="fa-solid fa-building"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-black text-xl text-slate-800">{{ item.client }}</h3>
-                                <p class="text-slate-500 font-medium text-sm flex items-center gap-1">
-                                    <i class="fa-solid fa-location-arrow text-slate-400 text-xs"></i> {{ item.branch }}
-                                </p>
-                            </div>
-                        </div>
+                <!-- Branches -->
+                <div v-for="branchGroup in clientGroup.branches" :key="branchGroup.name" class="mb-6 mr-6 sm:mr-8 pr-4 sm:pr-6 border-r-4 border-indigo-100">
+                    
+                    <!-- Branch Header -->
+                    <div class="flex items-center justify-between mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-location-arrow text-slate-400"></i>
+                            فرع: {{ branchGroup.name }}
+                        </h3>
+                        <span class="bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-lg">
+                            {{ branchGroup.count }} أذونات
+                        </span>
+                    </div>
 
-                        <div class="flex flex-wrap gap-2 mt-4">
-                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold border border-blue-100"><i class="fa-solid fa-user-tie"></i> {{ item.delegate }}</span>
-                            <span class="px-3 py-1 bg-orange-50 text-orange-700 rounded-lg text-sm font-bold border border-orange-100"><i class="fa-solid fa-steering-wheel"></i> {{ item.driver }}</span>
-                            <span v-if="item.notes" class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold border border-slate-200"><i class="fa-solid fa-note-sticky text-slate-400"></i> {{ item.notes }}</span>
+                    <!-- Cards -->
+                    <div class="space-y-4">
+                        <div v-for="item in branchGroup.receipts" :key="item.id" class="premium-card p-5 relative overflow-hidden group hover:-translate-y-1 transition-transform bg-white">
+                            
+                            <div v-if="item.status === 'archived'" class="absolute -left-10 -top-10 bg-emerald-500 w-24 h-24 transform -rotate-45 flex items-end justify-center pb-2 shadow-lg z-10">
+                                <i class="fa-solid fa-check text-white text-xl transform rotate-45"></i>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap gap-2 mt-1">
+                                        <span class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold border border-blue-100"><i class="fa-solid fa-user-tie ml-1"></i> {{ item.delegate }}</span>
+                                        <span class="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-sm font-bold border border-orange-100"><i class="fa-solid fa-steering-wheel ml-1"></i> {{ item.driver }}</span>
+                                        <span v-if="item.notes" class="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold border border-slate-200"><i class="fa-solid fa-note-sticky text-slate-400 ml-1"></i> {{ item.notes }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col items-end justify-between min-w-[140px]">
+                                    <div class="text-left bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-full mb-3 flex items-center justify-between">
+                                        <div class="text-xs text-slate-400 font-bold"><i class="fa-regular fa-calendar ml-1"></i>{{ item.dateStr }}</div>
+                                        <div class="text-sm font-black text-slate-700"><i class="fa-regular fa-clock text-primary ml-1"></i>{{ item.timeStr }}</div>
+                                    </div>
+                                    <div class="w-full flex gap-2">
+                                        <button v-if="tab === 'pending'" @click="markAsArchived(item)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-sm">
+                                            <i class="fa-solid fa-check"></i> استلمت
+                                        </button>
+                                        <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 px-4 rounded-xl transition-all border border-rose-200 text-sm">
+                                            <i class="fa-solid fa-trash-can"></i> حذف
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-end justify-between min-w-[120px]">
-                        <div class="text-left bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-full mb-4">
-                            <div class="text-xs text-slate-400 font-bold mb-1"><i class="fa-regular fa-calendar"></i> {{ item.dateStr }}</div>
-                            <div class="text-sm font-black text-slate-700"><i class="fa-regular fa-clock text-primary"></i> {{ item.timeStr }}</div>
-                        </div>
-                        <div class="w-full flex gap-2">
-                            <button v-if="tab === 'pending'" @click="markAsArchived(item)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-sm">
-                                <i class="fa-solid fa-check"></i> استلمت
-                            </button>
-                            <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 px-4 rounded-xl transition-all border border-rose-200 text-sm">
-                                <i class="fa-solid fa-trash-can"></i> حذف
-                            </button>
-                        </div>
-                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
     </div>
@@ -260,6 +287,24 @@ const app = createApp({
             }
             return list;
         });
+        const groupedReceipts = computed(() => {
+            const groups = {};
+            filteredReceipts.value.forEach(r => {
+                if(!groups[r.client]) groups[r.client] = { name: r.client, count: 0, branches: {} };
+                groups[r.client].count++;
+                
+                if(!groups[r.client].branches[r.branch]) {
+                    groups[r.client].branches[r.branch] = { name: r.branch, count: 0, receipts: [] };
+                }
+                groups[r.client].branches[r.branch].count++;
+                groups[r.client].branches[r.branch].receipts.push(r);
+            });
+            return Object.values(groups).map(client => ({
+                ...client,
+                branches: Object.values(client.branches).sort((a,b) => b.count - a.count)
+            })).sort((a,b) => b.count - a.count);
+        });
+
 
         const saveLocal = (key, val) => { localStorage.setItem(key === 'delegate' ? 'savedDelegate' : 'savedDriver', val); };
 
@@ -357,7 +402,7 @@ const app = createApp({
 
         return {
             clientNames, delegates, drivers, form, isSubmitting, receipts, tab, searchQuery, currentView,
-            currentBranches, filteredReceipts, pendingCount, archivedCount,
+            currentBranches, groupedReceipts, filteredReceipts, pendingCount, archivedCount,
             saveLocal, onClientChange, submitReceipt, markAsArchived, softDelete
         };
     }
