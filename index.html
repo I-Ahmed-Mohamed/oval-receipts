@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أذونات أوفال - الإصدار الجديد</title>
+    <title>تسجيل الأذونات - أوفال</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,20 +11,25 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563eb',
-                        secondary: '#1e40af',
-                        accent: '#f59e0b',
-                        dark: '#0f172a'
+                        primary: '#4f46e5',
+                        primaryHover: '#4338ca',
+                        secondary: '#0f172a',
+                        surface: '#ffffff',
+                        background: '#f8fafc',
                     },
                     fontFamily: {
                         sans: ['Tajawal', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(79, 70, 229, 0.15)'
                     }
                 }
             }
         }
     </script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SweetAlert2 -->
@@ -32,178 +37,287 @@
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    <!-- Firebase 8 -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; }
-        .glass-card {
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .premium-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.6);
+            overflow: hidden;
         }
-        .form-select, .form-input {
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .input-group i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            transition: color 0.3s;
+        }
+        .premium-input {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            padding: 14px 16px 14px 48px; /* padding right for icon in RTL */
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
             background-color: #f8fafc;
+            color: #1e293b;
+            font-weight: 500;
             outline: none;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            appearance: none;
         }
-        .form-select:focus, .form-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        .input-group:focus-within i { color: #4f46e5; }
+        .premium-input:focus {
+            border-color: #4f46e5;
             background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
-        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        .premium-button {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 16px;
+            border-radius: 16px;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+        }
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.5);
+        }
+        .premium-button:active {
+            transform: translateY(0);
+        }
+        
+        .tab-btn {
+            position: relative;
+            z-index: 1;
+        }
+        .tab-active-bg {
+            position: absolute;
+            inset: 0;
+            background: #0f172a;
+            border-radius: 14px;
+            z-index: -1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .list-item-card {
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+        }
+        .list-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1);
+            border-color: #e2e8f0;
+        }
+        /* Custom scrollbar for dropdowns */
+        select { cursor: pointer; }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
-<body class="text-slate-800 pb-20">
+<body class="pb-24 pt-6 px-4">
 
-<div id="app" class="max-w-4xl mx-auto p-4 sm:p-6 mt-4">
-    <!-- Header -->
-    <header class="flex items-center justify-between mb-8 glass-card p-6">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-500/30">
-                <i class="fa-solid fa-file-signature"></i>
+<div id="app" class="app-container">
+    
+    <!-- Top Header -->
+    <header class="flex items-center justify-between mb-8 premium-card p-5 px-8">
+        <div class="flex items-center gap-5">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white text-2xl shadow-glow">
+                <i class="fa-solid fa-truck-fast"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-bold text-dark">أذونات أوفال</h1>
-                <p class="text-slate-500 text-sm">نظام تسجيل الأذونات السريع</p>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">أذونات أوفال</h1>
+                <p class="text-slate-500 font-medium mt-1">إدارة وتسجيل حركة التسليمات</p>
             </div>
+        </div>
+        <div class="hidden md:block">
+            <span class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl font-bold border border-indigo-100 shadow-sm">
+                <i class="fa-solid fa-signal mr-2 ml-1"></i> يعمل مستقلاً (Offline)
+            </span>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- New Permit Form -->
-        <div class="lg:col-span-5">
-            <div class="glass-card p-6 sticky top-6">
-                <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-primary">
-                    <i class="fa-solid fa-plus-circle"></i> إذن جديد
-                </h2>
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <!-- Right Column: Form -->
+        <div class="w-full lg:w-5/12">
+            <div class="premium-card p-8 sticky top-8">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">إضافة إذن جديد</h2>
+                </div>
 
-                <form @submit.prevent="submitReceipt" class="space-y-5">
+                <form @submit.prevent="submitReceipt">
                     
-                    <!-- Delegate -->
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">المندوب</label>
-                        <select v-model="form.delegate" @change="saveLocal('delegate', form.delegate)" required class="form-select">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <select v-model="form.delegate" @change="saveLocal('delegate', form.delegate)" required class="premium-input" style="padding-right: 48px; padding-left: 16px;">
                             <option value="" disabled>-- اختر المندوب --</option>
                             <option v-for="d in delegates" :key="d" :value="d">{{ d }}</option>
                         </select>
                     </div>
 
-                    <!-- Driver -->
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">السائق</label>
-                        <select v-model="form.driver" @change="saveLocal('driver', form.driver)" required class="form-select">
+                    <div class="input-group">
+                        <i class="fa-solid fa-truck-moving"></i>
+                        <select v-model="form.driver" @change="saveLocal('driver', form.driver)" required class="premium-input" style="padding-right: 48px; padding-left: 16px;">
                             <option value="" disabled>-- اختر السائق --</option>
                             <option v-for="d in drivers" :key="d" :value="d">{{ d }}</option>
                         </select>
                     </div>
 
-                    <!-- Client -->
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">العميل</label>
-                        <select v-model="form.client" @change="onClientChange" required class="form-select">
+                    <div class="input-group">
+                        <i class="fa-solid fa-building"></i>
+                        <select v-model="form.client" @change="onClientChange" required class="premium-input" style="padding-right: 48px; padding-left: 16px;">
                             <option value="" disabled>-- اختر العميل --</option>
                             <option v-for="c in clients" :key="c.name" :value="c.name">{{ c.name }}</option>
                         </select>
                     </div>
 
-                    <!-- Branch -->
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">الفرع</label>
-                        <select v-model="form.branch" required class="form-select" :disabled="!form.client">
+                    <div class="input-group">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <select v-model="form.branch" required class="premium-input" :disabled="!form.client" :class="{'opacity-60': !form.client}" style="padding-right: 48px; padding-left: 16px;">
                             <option value="" disabled>-- اختر الفرع --</option>
                             <option v-for="b in currentBranches" :key="b" :value="b">{{ b }}</option>
                         </select>
                     </div>
 
-                    <!-- Date -->
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">التاريخ (اختياري)</label>
-                        <input type="date" v-model="form.date" class="form-input">
+                    <div class="input-group">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        <input type="date" v-model="form.date" class="premium-input" style="padding-right: 48px; padding-left: 16px;" title="التاريخ (اختياري)">
                     </div>
 
-                    <!-- Notes -->
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">ملاحظات (رقم بوليصة الخ)</label>
-                        <input type="text" v-model="form.notes" placeholder="ملاحظات إضافية..." class="form-input">
+                    <div class="input-group">
+                        <i class="fa-solid fa-pen-clip"></i>
+                        <input type="text" v-model="form.notes" placeholder="ملاحظات (رقم بوليصة، الخ...)" class="premium-input" style="padding-right: 48px; padding-left: 16px;">
                     </div>
 
-                    <button type="submit" :disabled="isSubmitting" class="w-full bg-primary hover:bg-secondary text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 mt-4 disabled:opacity-50">
-                        <i v-if="!isSubmitting" class="fa-solid fa-paper-plane"></i>
-                        <i v-else class="fa-solid fa-spinner fa-spin"></i>
-                        {{ isSubmitting ? 'جاري التسجيل...' : 'تسجيل الإذن' }}
+                    <button type="submit" :disabled="isSubmitting" class="premium-button mt-4 flex items-center justify-center gap-3">
+                        <i v-if="!isSubmitting" class="fa-solid fa-paper-plane text-xl"></i>
+                        <i v-else class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+                        <span>{{ isSubmitting ? 'جاري التسجيل...' : 'تسجيل الإذن الآن' }}</span>
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- History -->
-        <div class="lg:col-span-7">
-            <!-- Tabs -->
-            <div class="flex gap-2 mb-6 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
-                <button @click="tab = 'pending'" :class="tab === 'pending' ? 'bg-primary text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'" class="flex-1 py-3 font-bold rounded-lg transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-hourglass-half"></i> المعلقة
-                    <span class="bg-white/20 px-2 py-0.5 rounded-full text-sm">{{ pendingCount }}</span>
+        <!-- Left Column: History -->
+        <div class="w-full lg:w-7/12 flex flex-col">
+            
+            <!-- Modern Tabs -->
+            <div class="premium-card p-2 mb-6 flex relative">
+                <button @click="tab = 'pending'" :class="tab === 'pending' ? 'text-white' : 'text-slate-500 hover:text-slate-800'" class="flex-1 py-3.5 font-bold text-lg rounded-2xl transition-colors relative z-10 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-clock"></i> قيد الانتظار
+                    <span :class="tab === 'pending' ? 'bg-white/20' : 'bg-slate-100'" class="px-2.5 py-0.5 rounded-full text-sm ml-1 transition-colors">{{ pendingCount }}</span>
                 </button>
-                <button @click="tab = 'archived'" :class="tab === 'archived' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'" class="flex-1 py-3 font-bold rounded-lg transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-box-archive"></i> الأرشيف
-                    <span class="bg-white/20 px-2 py-0.5 rounded-full text-sm">{{ archivedCount }}</span>
+                <button @click="tab = 'archived'" :class="tab === 'archived' ? 'text-white' : 'text-slate-500 hover:text-slate-800'" class="flex-1 py-3.5 font-bold text-lg rounded-2xl transition-colors relative z-10 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check-double"></i> الأرشيف
+                    <span :class="tab === 'archived' ? 'bg-white/20' : 'bg-slate-100'" class="px-2.5 py-0.5 rounded-full text-sm ml-1 transition-colors">{{ archivedCount }}</span>
                 </button>
+                
+                <!-- Animated Active Background -->
+                <div class="absolute top-2 bottom-2 w-[calc(50%-8px)] bg-secondary rounded-xl transition-all duration-300 ease-out z-0"
+                     :style="tab === 'pending' ? 'right: 8px;' : 'right: calc(50% + 4px);'"></div>
             </div>
 
-            <!-- Search -->
-            <div class="relative mb-6">
-                <input type="text" v-model="searchQuery" placeholder="ابحث باسم العميل أو الفرع..." class="w-full py-4 pr-12 pl-4 rounded-xl border border-slate-200 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
-                <i class="fa-solid fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+            <!-- Search Bar -->
+            <div class="premium-card p-3 mb-6 relative">
+                <i class="fa-solid fa-magnifying-glass absolute right-7 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                <input type="text" v-model="searchQuery" placeholder="ابحث باسم العميل، الفرع، المندوب..." class="w-full bg-slate-50 border-none rounded-xl py-4 pr-14 pl-4 font-medium text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-shadow">
             </div>
 
             <!-- List -->
-            <div class="space-y-4">
-                <div v-if="filteredReceipts.length === 0" class="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300">
-                    <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                    <p class="text-slate-500 font-bold">لا يوجد أذونات تطابق بحثك</p>
+            <div class="flex-1">
+                <div v-if="filteredReceipts.length === 0" class="premium-card p-16 flex flex-col items-center justify-center text-center">
+                    <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-700 mb-2">لا توجد أذونات</h3>
+                    <p class="text-slate-500">القائمة فارغة أو لا يوجد نتائج تطابق بحثك حالياً.</p>
                 </div>
 
-                <div v-for="item in filteredReceipts" :key="item.id" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                    <div v-if="item.status === 'archived'" class="absolute top-0 right-0 bg-slate-800 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                        <i class="fa-solid fa-check"></i> مستلم
-                    </div>
-                    
-                    <div class="flex justify-between items-start mb-3 mt-1">
-                        <div>
-                            <h3 class="font-bold text-lg text-primary">{{ item.client }} <span class="text-slate-400 font-normal mx-1">-</span> <span class="text-slate-700">{{ item.branch }}</span></h3>
-                            <div class="text-xs text-slate-500 mt-1 flex items-center gap-3">
-                                <span><i class="fa-regular fa-calendar"></i> {{ item.dateStr }}</span>
-                                <span><i class="fa-regular fa-clock"></i> {{ item.timeStr }}</span>
+                <div class="space-y-4">
+                    <div v-for="item in filteredReceipts" :key="item.id" class="premium-card list-item-card p-6 relative overflow-hidden group">
+                        
+                        <!-- Archive Ribbon -->
+                        <div v-if="item.status === 'archived'" class="absolute -left-10 -top-10 bg-emerald-500 w-24 h-24 transform -rotate-45 flex items-end justify-center pb-2 shadow-lg z-10">
+                            <i class="fa-solid fa-check text-white text-xl transform rotate-45"></i>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <!-- Info -->
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary shrink-0">
+                                        <i class="fa-solid fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-black text-xl text-slate-800">{{ item.client }}</h3>
+                                        <p class="text-slate-500 font-medium text-sm flex items-center gap-1">
+                                            <i class="fa-solid fa-location-arrow text-slate-400 text-xs"></i> {{ item.branch }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <div class="badge bg-blue-50 text-blue-700 border border-blue-100">
+                                        <i class="fa-solid fa-user-tie"></i> {{ item.delegate }}
+                                    </div>
+                                    <div class="badge bg-orange-50 text-orange-700 border border-orange-100">
+                                        <i class="fa-solid fa-steering-wheel"></i> {{ item.driver }}
+                                    </div>
+                                    <div v-if="item.notes" class="badge bg-slate-100 text-slate-700 border border-slate-200">
+                                        <i class="fa-solid fa-note-sticky text-slate-400"></i> {{ item.notes }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Side (Time & Actions) -->
+                            <div class="flex flex-col items-end justify-between min-w-[120px]">
+                                <div class="text-left bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 w-full mb-4">
+                                    <div class="text-xs text-slate-400 font-bold mb-1"><i class="fa-regular fa-calendar"></i> {{ item.dateStr }}</div>
+                                    <div class="text-sm font-black text-slate-700"><i class="fa-regular fa-clock text-primary"></i> {{ item.timeStr }}</div>
+                                </div>
+
+                                <div class="w-full flex gap-2">
+                                    <button v-if="tab === 'pending'" @click="markAsArchived(item.id)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md shadow-emerald-500/20 text-sm flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-check"></i> استلمت
+                                    </button>
+                                    <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2.5 px-4 rounded-xl transition-all border border-rose-200 text-sm flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-trash-can"></i> حذف
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-md border border-blue-100"><i class="fa-solid fa-user-tie"></i> {{ item.delegate }}</span>
-                        <span class="bg-orange-50 text-orange-700 text-xs px-2.5 py-1 rounded-md border border-orange-100"><i class="fa-solid fa-truck"></i> {{ item.driver }}</span>
-                        <span v-if="item.notes" class="bg-yellow-50 text-yellow-700 text-xs px-2.5 py-1 rounded-md border border-yellow-100"><i class="fa-solid fa-comment"></i> {{ item.notes }}</span>
-                    </div>
-
-                    <div class="flex gap-2 pt-3 border-t border-slate-100">
-                        <button v-if="tab === 'pending'" @click="markAsArchived(item.id)" class="flex-1 bg-green-50 hover:bg-green-100 text-green-700 font-bold py-2 rounded-lg transition-colors text-sm border border-green-200">
-                            <i class="fa-solid fa-check-circle"></i> استلمته
-                        </button>
-                        <button v-if="tab === 'archived'" @click="softDelete(item.id)" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-2 rounded-lg transition-colors text-sm border border-red-200">
-                            <i class="fa-solid fa-trash"></i> حذف نهائي
-                        </button>
-                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
