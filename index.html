@@ -440,8 +440,7 @@ app.component('custom-select', {
 
         watch(open, (val) => {
             if(val) {
-                updatePosition();
-
+                updatePosition(); }
             if(val) {
                 search.value = '';
                 nextTick(() => { if(searchInput.value) searchInput.value.focus(); });
